@@ -4,6 +4,9 @@ import <zlib.ash>;
 void sonarUse() {
 	if(have_item($item[sonar-in-a-biscuit]))
 		use(item_amount($item[sonar-in-a-biscuit]),$item[sonar-in-a-biscuit]);
+	if(!have_item($item[enchanted bean]) && 
+	(contains_text(visit_url("bathole.php"),"bathole_4.gif") || contains_text(visit_url("bathole.php"),"bathole_3.gif")))
+		obtain(1,$item[enchanted bean],$location[Beanbat Chamber]);
 }
 
 void BatQuest()
