@@ -51,32 +51,18 @@ void MosquitoQuest()
 	{
         council();
 
-		if (contains_text(visit_url("questlog.php?which=1"),"Looking for a Larva in All the Wrong Places"))
-		{
-			if (!haveLarva())
-			{
-				print_goal("Using custom duty searcher to find larva");
+		if (contains_text(visit_url("questlog.php?which=1"),"Looking for a Larva in All the Wrong Places"))	{
+			if (!haveLarva()) {
+				print_goal("Using custom searcher to find larva.");
 				custom_fight("haveLarva","searchWood",larva);
-				/*while(!have_item($item[mosquito larva]) {
-					restore_hp(0);
-					restore_mp(0);
-					while_abort();
-					searchWood(larva);
-				}*/
-			}
-			else
-			{
-				print_quest_complete("You've already acquires a mosquito larva.");
+			} else {
+				print_goal_complete("You've already acquires a mosquito larva.");
 			}
 			
 			council();
-		}
-		else if (contains_text(visit_url("questlog.php?which=2"),"Looking for a Larva in All the Wrong Places"))
-		{
+		} else if (contains_text(visit_url("questlog.php?which=2"),"Looking for a Larva in All the Wrong Places")) {
 			print_quest_complete("You have already completed the level 2 quest.");
-		}
-		else
-		{
+		} else {
 			print_warning("The level 2 quest is not currently available.");
 		}
 	}
@@ -97,16 +83,9 @@ boolean reachHiddenTemple() {
 void OpenTemple() {
 	if(!reachHiddenTemple()) {
 		print_goal("Searching for map and associating items..");
-		
 		custom_fight("reachHiddenTemple","searchWood",templeMap);
-		/*while(!have_item($item[spooky temple map]) || !have_item($item[Spooky-Gro fertilizer]) || !have_item($item[spooky sapling])) {
-			restore_hp(0);
-			restore_mp(0);
-			while_abort();
-			searchWood(templeMap);
-		}*/
 	} else {
-		print_quest_complete("The path to the Hidden Temple is already openned.");
+		print_quest_complete("The path to the Hidden Temple is already opened.");
 	}
 }
 

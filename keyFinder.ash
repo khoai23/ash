@@ -84,11 +84,8 @@ void digitalKey() {
 		print_quest_complete("Have digital key.");
 		return;
 	}
-	item subtituted = equipped_item($slot[acc3]);
-	familiar family = my_familiar();
-	if(have_familiar($familiar[Jumpsuited Hound Dog])) {
-		use_familiar($familiar[Jumpsuited Hound Dog]);
-	}
+	set_backup_state();
+	maximize_item();
 	if(equipped_amount($item[continuum transfunctioner])==0 && !have_item($item[continuum transfunctioner])) {
 		set_choices(664,1);
 		run_choice(visit_url("place.php?whichplace=forestvillage&action=fv_mystic"));
@@ -99,8 +96,7 @@ void digitalKey() {
 		while_abort();
 		adventure(1,$location[8-Bit Realm]);
 	}
-	use_familiar(family);
-	equip($slot[acc3],subtituted);
+	get_backup_state();
 	if(!have_item($item[digital key])) create(1,$item[digital key]);
 }
 
@@ -117,18 +113,6 @@ void skeletonKey() {
 }
 
 void main() {
-	if(!deityKey()) {
-		//vprint("You don't have enough tokens.","red",1);
-	} else {
-		vprint("Deity keys acquired.","green",1);
-	}
-	
-	if(!have_item($item[Richard's star key])) {
-		starKey();
-	} else {
-		vprint("Star key acquired.","green",1);
-	}
-	
 	if(!have_item($item[digital key])) {
 		digitalKey();
 	} else {
@@ -139,5 +123,16 @@ void main() {
 		skeletonKey();
 	} else {
 		vprint("Skeleton key acquired.","green",1);
+	}
+	
+	if(!deityKey()) {
+		//vprint("You don't have enough tokens.","red",1);
+	} else {
+		vprint("Deity keys acquired.","green",1);
+	}
+	if(!have_item($item[Richard's star key])) {
+		starKey();
+	} else {
+		vprint("Star key acquired.","green",1);
 	}
 }

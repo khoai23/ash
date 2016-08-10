@@ -1,12 +1,36 @@
 import <QuestLib.ash>;
 import <zlib.ash>;
 
-string olfact(int round, string opp, string text) {
-   if(opp != "dirty old lihc" || (have_effect($effect[On the Trail]) > 0))
-      return get_ccs_action(round);
-   if(round == 1)
-      return "skill transcendent olfaction";
-   return get_ccs_action(round - 1);
+boolean lastMonsterBossNook() {
+	return last_monster()==$monster[giant skeelton];
+}
+void helpWithNook() {
+	if(have_item($item[evil eye])) use(item_amount($item[evil eye]), $item[evil eye]);
+}
+
+boolean lastMonsterBossNiche() {
+	return last_monster()==$monster[gargantulihc];
+}
+
+string olfactHandling() {
+	string page = visit_url("adventure.php?snarfblat=263");
+	
+	if(contains_text(page,"Combat")) {
+		if(contains_text(page,"dirty old lihc") && have_effect($effect[On The Trail])==0) {
+			page = use_skill();
+		}
+		page = run_combat();
+	} else {
+		page = run_choice(page);
+	}
+}
+
+boolean lastMonsterBossCranny() {
+	return last_monster()==$monster[huge ghuol];
+}
+
+boolean lastMonsterBossAlcove() {
+	return last_monster()==$monster[conjoined zmombie];
 }
 
 void CyrptQuest()
@@ -15,91 +39,71 @@ void CyrptQuest()
 	{
         council();
 
-		if (contains_text(visit_url("questlog.php?which=1"),"Cyrptic Emanations"))
-		{
+		if (contains_text(visit_url("questlog.php?which=1"),"Cyrptic Emanations")) {
 			cli_execute("conditions clear");
+			set_backup_state();
 
 			if(contains_text(visit_url("crypt.php"),"ul.gif")) {
-				vprint("undefiling Nook..","olive",5);
-				while(last_monster()!=$monster[giant skeelton]) {
-					adventure(1, $location[The Defiled Nook]);
-					if(have_item($item[evil eye])) use(1, $item[evil eye]);
-					while_abort();
-				}
+				print_goal("undefiling Nook..");
+				fulfill_condition("lastMonsterBossNook","helpWithNook",$location[The Defiled Nook]);
 			} else {
-				vprint("Nook already undefiled. Moving on","green",1);
+				print_goal_complete("Nook already undefiled. Moving on");
 			}
 			
-			// todo automatic olfact
 			if(contains_text(visit_url("crypt.php"),"ur.gif")) {
-				vprint("undefiling Niche..","olive",4);
-				while(last_monster()!=$monster[gargantulihc]) {
-					adventure(1, $location[The Defiled Niche]);
-					while_abort();
-				}
+				print_goal("undefiling Niche..");
+				custom_fight("lastMonsterBossNiche","olfactHandling");
 			} else {
-				vprint("Niche already undefiled. Moving on","green",1);
+				print_goal_complete("Niche already undefiled. Moving on");
 			}
 			
 			if(contains_text(visit_url("crypt.php"),"ll.gif")) {
-				vprint("undefiling Cranny..","olive",5);
-				while(last_monster()!=$monster[huge ghuol]) {
-					adventure(1, $location[The Defiled Cranny]);
-					while_abort();
-				}
+				print_goal("undefiling Cranny..");
+				set_choices(523,4);
+				fulfill_condition("lastMonsterBossCranny",$location[The Defiled Cranny]);
 			} else {
-				vprint("Cranny already undefiled. Moving on","green",1);
+				print_goal_complete("Cranny already undefiled. Moving on");
 			}
 			
 			if(contains_text(visit_url("crypt.php"),"lr.gif")) {
-				vprint("undefiling Alcove..","olive",5);
-				while(last_monster()!=$monster[conjoined zmombie]) {
-					adventure(1, $location[The Defiled Alcove]);
-					while_abort();
-				}
+				print_goal("undefiling Alcove..");
+				fulfill_condition("lastMonsterBossAlcove", $location[The Defiled Alcove]);
 			} else {
-				vprint("Alcove already undefiled. Moving on","green",1);
+				print_goal_complete("Alcove already undefiled. Moving on");
 			}
 			
 			while_abort();
 
-			if (user_confirm("Try for the rib of the Bonerdagon?"))
-			{
+			if (user_confirm("Try for the rib of the Bonerdagon?"))	{
 				change_mcd(5);
-			}
-			else if (user_confirm("Try for the vertebra of the Bonerdagon?"))
-			{
+			} else if (user_confirm("Try for the vertebra of the Bonerdagon?"))	{
 				change_mcd(10);
-			}
-			else if ((canadia_available()) && (!contains_text(visit_url("trophies.php"),"Boss Boss")))
-			{
-				if (user_confirm("Try for the Boss Boss trophy?"))
-				{
-					change_mcd(11);      
-				}
+			} else if (canadia_available() && (!contains_text(visit_url("trophies.php"),"Boss Boss")) 
+				&& user_confirm("Try for the Boss Boss trophy?")) {
+				change_mcd(11);
 			}
 
 			adventure(1, $location[Haert of the Cyrpt]);
 
-			if (available_amount($item[chest of the bonerdagon]) == 1)
-			{
+			if (have_item($item[chest of the bonerdagon])) {
 				use(1, $item[chest of the bonerdagon]);
 			}
 	
+			get_backup_state();
 			council();
 		}
 		else if (contains_text(visit_url("questlog.php?which=2"),"Cyrptic Emanations"))
 		{
-			vprint("You have already completed the level 7 quest.","green",1);
+			print_quest_complete("You have already completed the level 7 quest.");
 		}
 		else
 		{
-			vprint("The level 7 quest is not currently available.","black",1);
+			print_warning("The level 7 quest is not currently available.");
 		}
 	}
 	else
 	{
-		vprint("You must be at least level 7 to attempt this quest.","red",1);
+		print_not_qualified("You must be at least level 7 to attempt this quest.");
 	}
 }
 

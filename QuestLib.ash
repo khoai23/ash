@@ -9,6 +9,7 @@ int main_quest_info = 2;
 int quest_directive = 3;
 int action_directive = 4;
 int debug_info = 8;
+familiar backup_fam;
 
 // PRINTING FUNCTION
 void print_warning(string message,int verbosity) {
@@ -17,19 +18,24 @@ void print_warning(string message,int verbosity) {
 void print_warning(string message) {
 	print_warning(message,main_quest_info);
 }
+void print_minor_warning(string message) {
+	vprint("Minor:" + message,"red",action_directive);
+}
 void print_quest_complete(string message) {
-	vprint(message,"green",main_quest_info);
+	vprint("Quest:" + message,"green",main_quest_info);
 }
 void print_goal(string message) {
-	vprint(message,"blue",quest_directive);
+	vprint("Goal:" + message,"blue",quest_directive);
+}
+void print_goal_complete(string message) {
+	vprint("Goal:" + message,"green",main_quest_info);
 }
 void print_debug(string message) {
 	vprint(message,"olive",debug_info);
 }
 void print_not_qualified(string message) {
-	vprint(message,"maroon",main_quest_info);
+	vprint("Fail:" + message,"maroon",main_quest_info);
 }
-
 
 // GET/SET/CHECK FUNCTION
 
@@ -55,11 +61,35 @@ void set_choices(int choiceAdventure,int choice) {
 	set_property("choiceAdventure"+choiceAdventure,to_string(choice));
 }
 
+void set_backup_state() {
+	cli_execute("outfit save lib_backup");
+	backup_fam = my_familiar();
+}
+
+void get_backup_state() {
+	cli_execute("outfit lib_backup");
+	use_familiar(backup_fam);
+}
+
+boolean check_beaten_up() {
+	return (!get_recklessness() && (have_effect($effect[Beaten Up])>0));
+}
+
 void while_abort() {
 	if (my_adventures() == 0){
-		cli_execute("outfit checkpoint");
+		get_backup_state();
 		abort("Ran out of adventures.");
+	} else if(check_beaten_up()) {
+		get_backup_state();
+		abort("You are not reckless enough to adventure after having your ass whoop'd.");
 	}
+}
+
+int check_survive_clue() {
+	float damage = 13+25+50+125+250;
+	int cold_damage = to_int(damage*(100-elemental_resistance($element[cold]))/100);
+	int spooky_damage = to_int(damage*(100-elemental_resistance($element[spooky]))/100);
+	return my_maxhp() - (cold_damage + spooky_damage);
 }
 
 boolean have_saucepan() {
@@ -154,12 +184,12 @@ void maximize_resist() {
 	if (have_familiar($familiar[Exotic Parrot])) {
 		use_familiar($familiar[Exotic Parrot]);
 	}
-	if(have_skill($skill[elemental saucesphere]) && have_saucepan()) {
+	/*if(have_skill($skill[elemental saucesphere]) && have_saucepan()) {
 		use_skill(1,$skill[elemental saucesphere]);
 	}
 	if(have_skill($skill[ghostly shell])) {
 		use_skill(1,$skill[ghostly shell]);
-	}
+	}*/
 	
 	maximize("all resistance", get_recklessness());
 }
@@ -182,13 +212,36 @@ void maximize_meat() {
 	maximize("meat drop",get_recklessness());
 }
 
-void maximize_combat() {
+void maximize_strength() {
 	if(in_hardcore()) {
-		if (have_familiar($familiar[Lil' Barrel Mimic])) {
-			use_familiar($familiar[Lil' Barrel Mimic]);
+		if (have_familiar($familiar[Adorable Space Buddy])) {
+			use_familiar($familiar[Adorable Space Buddy]);
 		}
 	}
+	maximize("mainstat",true);
+}
+
+void maximize_noncom() {
+	if(my_familiar()==$familiar[Jumpsuited Hound Dog]) {
+		print_minor_warning("Familiar detrimental to progress.");
+		use_familiar($familiar[Mosquito]);
+	}
+	maximize("-combat",get_recklessness());
+}
+
+void maximize_com() {
+	if(have_familiar($familiar[Jumpsuited Hound Dog])) {
+		use_familiar($familiar[Jumpsuited Hound Dog]);
+	}
+	maximize("+combat",get_recklessness());
+}
+
+void maximize_cold() {
+	if (have_familiar($familiar[Exotic Parrot])) {
+		use_familiar($familiar[Exotic Parrot]);
+	}
 	
+	maximize("cold resistance", get_recklessness());
 }
 
 void maximize_for_ghost(){
@@ -220,6 +273,13 @@ void maximize_for_ghost(){
 	}
 	
 	maximize("maximum hp, cold resistance, spooky resistance", get_recklessness());
+	
+	int checker = check_survive_clue();
+	if(checker>0) {
+		if(my_maxhp()-my_hp()>checker) restore_hp(my_maxhp()-checker+1);
+	} else {
+		abort("You need "+(-checker+1)+"more max hp to clear it with clue.");
+	}
 }
 
 // HYBRID FUNCTION
@@ -243,6 +303,14 @@ buffer manual_run_choice(int choiceNumber,int choice) {
 }
 
 // AUTOMATON FUNCTION
+
+void obtain_outfit(string outfit, location loc) {
+	print_debug("@obtain_outfit outfit:"+outfit+"|loc:"+loc);
+	while(!have_outfit(outfit) && !is_wearing_outfit(outfit)) {
+		adventure(1,loc,"");
+		while_abort();
+	}
+}
 
 void custom_fight(string cond, string exec) {
 	print_debug("@custom_fight_with_exec condition:"+cond+"|exec:"+exec);
@@ -313,7 +381,7 @@ void use_still() {
 
 boolean acquire_token() {
 	int token_amount = item_amount($item[fat loot token]);
-	item subtituted = equipped_item($slot[acc3]);
+	set_backup_state();
 	if(have_familiar($familiar[Gelatinous Cubeling])) {
 		if(!have_item($item[eleven-foot pole]) || !have_item($item[Pick-o-Matic lockpicks]) 
 		|| (equipped_amount($item[ring of Detect Boring Doors])==0 &&!have_item($item[ring of Detect Boring Doors]))) {
@@ -340,7 +408,7 @@ boolean acquire_token() {
 		while_abort();
 		adv1($location[The Daily Dungeon],-1,"");
 	}
-	equip($slot[acc3],subtituted);
+	get_backup_state();
 	if(token_amount==item_amount($item[fat loot token])) {
 		abort("Token acquired today. Try tomorrow, or pull game magazine!");
 		return false;
@@ -353,6 +421,7 @@ void main()
 {
 	vprint("Used for testing new function and config.","blue",1);
 	open_pvp();
+	acquire_token();
 	boolean choice = user_confirm("Do you wish to be reckless and (maybe) get your ass beaten?");
 	set_recklessness(choice);
 	vprint("Recklessness: " + choice,"blue",1);

@@ -27,8 +27,7 @@ void TavernQuest()
 	{
         council();
 
-		if (contains_text(visit_url("questlog.php?which=1"),"Ooh, I Think I Smell a Rat"))
-		{
+		if (contains_text(visit_url("questlog.php?which=1"),"Ooh, I Think I Smell a Rat"))	{
 			visit_url("tavern.php?place=barkeep");
 
 			int progress = checkExploringProgress();
@@ -49,8 +48,7 @@ void TavernQuest()
 			visit_url("tavern.php?place=barkeep");
 			council();
 		}
-		else if (contains_text(visit_url("questlog.php?which=2"),"Ooh, I Think I Smell a Rat"))
-		{
+		else if (contains_text(visit_url("questlog.php?which=2"),"Ooh, I Think I Smell a Rat"))	{
 			print_quest_complete("You have already completed the level 3 quest.");
 		}
 		else

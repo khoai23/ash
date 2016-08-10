@@ -51,23 +51,27 @@ boolean gollyDone() {
 
 void FriarsQuest()
 {
-    if (my_level() >= 6)
-	{
+    if (my_level() >= 6) {
         council();
 	
-		if (contains_text(visit_url("questlog.php?which=1"),"Trial By Friar"))
-		{
+		if (contains_text(visit_url("questlog.php?which=1"),"Trial By Friar")) {
 			if (!have_item($item[Eldritch Butterknife])) {
 				print_goal("Search for butterknife.");
 				obtain(1, $item[Eldritch Butterknife], $location[The Dark Elbow of the Woods]);
+			} else {
+				print_goal_complete("Already have butterknife.");
 			}
 			if (!have_item($item[box of birthday candles]))	{
 				print_goal("Search for box of birthday candles.");
 				obtain(1, $item[box of birthday candles], $location[The Dark Heart of the Woods]);
+			} else {
+				print_goal_complete("Already have box of birthday candles.");
 			}
 			if (!have_item($item[Dodecagram])) {
 				print_goal("Search for dodecagram.");
 				obtain(1, $item[Dodecagram], $location[The Dark Neck of the Woods]);
+			} else {
+				print_goal_complete("Already have dodecagram.");
 			}
 			if (have_item($item[Eldritch Butterknife]) && have_item($item[box of birthday candles]) && have_item($item[Dodecagram])) {
 				while_abort();
@@ -75,18 +79,12 @@ void FriarsQuest()
 			}
 			
 			council();
-		}
-		else if (contains_text(visit_url("questlog.php?which=2"),"Trial By Friar"))
-		{
+		} else if (contains_text(visit_url("questlog.php?which=2"),"Trial By Friar")) {
 			print_quest_complete("You have already completed the level 6 quest.");
-		}
-		else
-		{
+		} else {
 			print_warning("The level 6 quest is not currently available.");
 		}
-	}
-	else
-	{
+	} else {
 		print_not_qualified("You must be at least level 6 to attempt this quest.");
 	}
 }
@@ -95,30 +93,37 @@ void SteelQuest()
 	if (my_level() >= 6)
 	{
 		visit_url("pandamonium.php");
-		if (contains_text(visit_url("questlog.php?which=2"),"Trial By Friar"))
-		{
-			if (!contains_text(visit_url("questlog.php?which=2"),"this is Azazel in Hell.")) 
-			{
-				if (!have_item($item[Azazel's lollipop]))
-				{
+		if (contains_text(visit_url("questlog.php?which=2"),"Trial By Friar")) {
+			if (!contains_text(visit_url("questlog.php?which=2"),"this is Azazel in Hell.")) {
+				
+				set_backup_state();
+				maximize_item();
+			
+				if (!have_item($item[Azazel's lollipop])) {
 					if(!have_item($item[observational glasses])) {
+						print_goal("Searching for appropriate tools.");
 						obtain(1, $item[observational glasses], $location[The Laugh Floor]);
+					} else {
+						print_goal_complete("Already have all the tools.");
 					}
 					
 					while_abort();
 					
-					item original = equipped_item($slot[acc3]);					
-					print_goal("Using observational humor...");
+					cli_execute("checkpoint");
+					print_goal("Using tools.");
 					equip($slot[acc3], $item[Observational glasses]);
+					equip($slot[weapon],$item[hilarious comedy prop]);
+					equip($item[Victor the insult]);
 					visit_url("pandamonium.php?action=mourn&preaction=observe");
-					equip($slot[acc3], original);
+					visit_url("pandamonium.php?action=mourn&preaction=prop");
+					visit_url("pandamonium.php?action=mourn&preaction=insult");
+					cli_execute("outfit checkpoint");
 				}
 				
-				if (!have_item($item[Azazel's unicorn]))
-				{
-					// Find out what bandmembers were previously completed
+				if (!have_item($item[Azazel's unicorn])) {
+					// Meeting sven
 					string sven = visit_url("pandamonium.php?action=sven");
-					// If this was the first visit to sven, he needs to be checked again
+					// If this is the first visit to sven, he needs to be checked again
 					if(sven.contains_text("value=\"help\""))
 					sven = visit_url("pandamonium.php?action=sven");
 					if(!sven.contains_text("You should probably go talk to the some of the band")) {
@@ -128,14 +133,9 @@ void SteelQuest()
 					}
 					
 					fulfill_condition("gollyDone",$location[Infernal Rackets Backstage]);
-					/*
-					while (!gollyDone()) {
-						while_abort();
-						adventure(1,$location[Infernal Rackets Backstage]);
-					}
 					*/
 					
-					print_goal("Giving items to bandmembers...");
+					print_goal("Giving items to bandmembers.");
 					foreach name, mate in gollyMap {
 						if(!mate.isdone) {
 							if(available_amount(mate.item1)>0)
@@ -146,21 +146,21 @@ void SteelQuest()
 					}
 				}
 				
-				if (!have_item($item[Azazel's tutu]))
-				{
+				if (!have_item($item[Azazel's tutu])) {
 					visit_url("pandamonium.php?action=moan");
 					cli_execute("conditions clear");
+					print_goal("Searching for items.");
 					if(available_amount($item[imp air]) < 5) {
 						obtain(5, $item[imp air], $location[The Laugh Floor]);
 					}
 					if(available_amount($item[bus pass]) < 5) {
 						obtain(5, $item[bus pass], $location[Infernal Rackets Backstage]);
 					}
-					print_goal("Giving items to strangers...");
+					print_goal("Giving items to strangers.");
 					visit_url("pandamonium.php?action=moan");
 				}
 				
-				print_goal("Return Arazel's belonging...");
+				print_goal("Return Arazel's belonging.");
 				visit_url("pandamonium.php?action=temp");
 
 				if (available_amount($item[steel margarita]) > 0)

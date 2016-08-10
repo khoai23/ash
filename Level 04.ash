@@ -18,14 +18,17 @@ void BatQuest()
 		if (contains_text(visit_url("questlog.php?which=1"),"Ooh, I Think I Smell a Bat.")) {
 			// Try opening the way to the lair
 			if(elemental_resistance($element[stench]) >= 10.00) {
-				print_debug("Have enough resistance(1).");
+				print_goal_complete("Have enough resistance(1).");
 			} else if(user_confirm("Do you wish to find stench resistance in the entryway instead?")) {
+				set_backup_state();
+				maximize_item();
 				obtain(1,$item[Pine-Fresh air freshener], $location[The Bat Hole Entrance]);
+				get_backup_state();
 			} else {
 				abort("Please boost stench resistance and try again.");
 			}
 			
-			if(elemental_resistance($element[stench]) >= 10.00) {
+			if(elemental_resistance($element[stench]) >= 10.00 && !contains_text(visit_url("bathole.php"),"bathole_4.gif")) {
 				print_goal("Finding the way to the boss room");
 				open_location("bathole.php","bathole_4.gif",$location[Guano Junction]);
 				print_debug("Opened way to the boss room");
@@ -33,6 +36,8 @@ void BatQuest()
 			
 			// killing Boss Bat and its retinue
             if (contains_text(visit_url("bathole.php"),"The Boss Bat's Lair (1)")) {
+				set_backup_state();
+				maximize_meat();
 				if (user_confirm("Try for the Boss Bat britches?"))
 				{
 					change_mcd(4);
@@ -54,6 +59,7 @@ void BatQuest()
 					while_abort();
 					adventure(1, $location[The Boss Bat's Lair]);
 				}
+				get_backup_state();
 			}
 			else
 			{
@@ -61,18 +67,12 @@ void BatQuest()
 			}
 			
 			council();
-		}
-		else if (contains_text(visit_url("questlog.php?which=2"),"Ooh, I Think I Smell a Bat."))
-		{
+		} else if (contains_text(visit_url("questlog.php?which=2"),"Ooh, I Think I Smell a Bat.")) {
 			print_quest_complete("You have already completed the level 4 quest.");
-		}
-		else
-		{
+		} else {
 			print_warning("The level 4 quest is not currently available.");
 		}
-	}
-	else
-	{
+	} else {
 		print_not_qualified("You must be at least level 4 to attempt this quest.");
 	}
 }
