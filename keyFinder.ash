@@ -58,16 +58,14 @@ void starKey() {
 		print_quest_complete("Have Richard's star key.");
 		return;
 	}
-	familiar family = my_familiar();
-	if(have_familiar($familiar[Jumpsuited Hound Dog])) {
-		use_familiar($familiar[Jumpsuited Hound Dog]);
-	}
+	set_backup_state();
+	maximize_item();
 	while(!have_item($item[Richard's star key]) &&
 			!(have_item($item[star chart]) && item_amount($item[star])>=8 && item_amount($item[line])>=7)) {
 		while_abort();
 		adventure(1,$location[The Hole In The Sky]);
 	}
-	use_familiar(family);
+	get_backup_state();
 	if(!have_item($item[Richard's star key])) create(1,$item[Richard's star key]);
 }
 
@@ -131,6 +129,7 @@ void main() {
 		vprint("Deity keys acquired.","green",1);
 	}
 	if(!have_item($item[Richard's star key])) {
+		if(my_level()<10) abort("Not enough level to even try for star key.");
 		starKey();
 	} else {
 		vprint("Star key acquired.","green",1);

@@ -6,13 +6,12 @@ void sonarUse() {
 		use(item_amount($item[sonar-in-a-biscuit]),$item[sonar-in-a-biscuit]);
 	if(!have_item($item[enchanted bean]) && 
 	(contains_text(visit_url("bathole.php"),"bathole_4.gif") || contains_text(visit_url("bathole.php"),"bathole_3.gif")))
-		obtain(1,$item[enchanted bean],$location[Beanbat Chamber]);
+		obtain(1,$item[enchanted bean],$location[The Beanbat Chamber]);
 }
 
 void BatQuest()
 {  
-	if (my_level() >= 4) 
-	{
+	if (my_level() >= 4) {
 		council();
 	
 		if (contains_text(visit_url("questlog.php?which=1"),"Ooh, I Think I Smell a Bat.")) {

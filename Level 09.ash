@@ -4,25 +4,19 @@ boolean checkTwinPeakProgress() {
 	int twinPeakProgress = to_int(get_property("twinPeakProgress"));
 	if((twinPeakProgress & 1) == 0) {
 		if(elemental_resistance($element[stench]) < 40.0) {
-			if (have_familiar($familiar[Exotic Parrot])) {
-				use_familiar($familiar[Exotic Parrot]);
-			}
-			if(have_skill($skill[elemental saucesphere])) {
-				use_skill(1,$skill[elemental saucesphere]);
-			}
-			if(have_skill($skill[ghostly shell])) {
-				use_skill(1,$skill[ghostly shell]);
-			}
+			maximize_stench();
 		}
 		if(elemental_resistance($element[stench]) < 40.0) {
 			abort("Ready for choice 1, but not enough resistance.");
 		}
+		print_debug("Set choice to stench.");
 		set_choices(606,1);
 		set_choices(607,1);
 	} else if((twinPeakProgress & 2) == 0) {
 		if((item_drop_modifier() < 50 && have_effect($effect[Brother Flying Burrito's Blessing])==0) || (item_drop_modifier() < 20)) {
 			abort("Ready for choice 2, but not enough +item.");
 		}
+		print_debug("Set choice to +item.");
 		set_choices(606,2);
 		set_choices(608,1);
 	} else if((twinPeakProgress & 4) == 0) {
@@ -31,6 +25,7 @@ boolean checkTwinPeakProgress() {
 				abort("Ready for choice 3, but not enough oil piece to make jar of oil.");
 			}
 		}
+		print_debug("Set choice to jar of oil.");
 		set_choices(606,3);
 		set_choices(609,1);
 		set_choices(616,1);
@@ -43,10 +38,12 @@ boolean checkTwinPeakProgress() {
 		if(initiative_modifier()<40) {
 			abort("Ready for choice 4, but not enough initiative.");
 		}
+		print_debug("Set choice to init.");
 		set_choices(606,4);
 		set_choices(610,1);
 		set_choices(617,1);
 	} else if(twinPeakProgress>7){
+		print_debug("Set choice to escape, which shouldn't happen anyway.");
 		set_choices(606,0);
 	} else {
 		abort("Something had messed up the variable. Aborting.");
@@ -55,8 +52,10 @@ boolean checkTwinPeakProgress() {
 }
 
 boolean bridgeComplete() {
+	print_debug("Progress: "+get_property("chasmBridgeProgress"));
 	return get_property("chasmBridgeProgress").to_int() >= 30;
 }
+
 void buildBridge() {
 	if(have_item($item[smut orc keepsake box])) {
 		use(1,$item[smut orc keepsake box]);
@@ -74,8 +73,7 @@ boolean ghostPeakReady() {
 
 void LOLQuest()
 {
-	if (my_level() >= 9)
-	{
+	if (my_level() >= 9) {
 		council();
 
 		if (contains_text(visit_url("questlog.php?which=1"),"There Can Be Only One Topping")) {
@@ -172,18 +170,12 @@ void LOLQuest()
 			visit_url("place.php?whichplace=highlands&action=highlands_dude");
 			
             council();
-		}
-		else if (contains_text(visit_url("questlog.php?which=2"),"There Can Be Only One Topping"))
-		{
+		} else if (contains_text(visit_url("questlog.php?which=2"),"There Can Be Only One Topping")) {
 			print_quest_complete("You have already completed the level 9 quest.");
-		}
-		else
-		{
+		} else {
 			vprint("The level 9 quest is not currently available.","black",1);
 		}
-	}
-	else
-	{
+	} else {
 		vprint("You must be at least level 9 to attempt this quest.","red",1);
 	}
 }

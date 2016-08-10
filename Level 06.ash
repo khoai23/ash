@@ -13,36 +13,36 @@ gollyMap["Bognort"].item1 = $item[giant marshmallow];
 gollyMap["Bognort"].item2 = $item[gin-soaked blotter paper]; 
 gollyMap["Bognort"].isdone = false; 
 
-gollyMap["Stinkface"].item1 = $item[gin-soaked blotter paper]; 
-gollyMap["Stinkface"].item2 = $item[beer-scented teddy bear]; 
+gollyMap["Stinkface"].item1 = $item[beer-scented teddy bear]; 
+gollyMap["Stinkface"].item2 = $item[gin-soaked blotter paper]; 
 gollyMap["Stinkface"].isdone = false; 
 
 gollyMap["Flargwurm"].item1 = $item[booze-soaked cherry]; 
 gollyMap["Flargwurm"].item2 = $item[sponge cake]; 
 gollyMap["Flargwurm"].isdone = false; 
 
-gollyMap["Jim"].item1 = $item[sponge cake]; 
-gollyMap["Jim"].item2 = $item[comfy pillow]; 
+gollyMap["Jim"].item1 = $item[comfy pillow]; 
+gollyMap["Jim"].item2 = $item[sponge cake]; 
 gollyMap["Jim"].isdone = false; 
 
 void giveToGolly(item i, string who){
    print_debug("Giving " + i + " to " + who);
-   if(item_amount(i) > 0 || take_closet(1, i)) {
+   if(have_item(i)) {
       visit_url("pandamonium.php?action=sven&bandmember=" + who + "&togive=" + to_int(i) + "&preaction=try");
       gollyMap[who].isdone = true;
    }
 }
 
 boolean gollyDone() {
-   int [item] trade;
+   boolean [item] trade;
    foreach it in $items[giant marshmallow,gin-soaked blotter paper,beer-scented teddy bear,booze-soaked cherry,sponge cake,comfy pillow]
-      trade[it] = available_amount(it);
+      trade[it] = have_item(it);
       
    boolean good = true;
    foreach name,mate in gollyMap{
       if(!mate.isdone) {
-         if(trade[mate.item1] > 0) trade[mate.item1] -= 1;
-         else if(trade[mate.item2] > 0) trade[mate.item2] -= 1;
+         if(trade[mate.item1]) trade[mate.item1] = false;
+         else if(trade[mate.item2]) trade[mate.item2] = false;
          else good = false;
       }
    }

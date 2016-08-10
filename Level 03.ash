@@ -23,8 +23,7 @@ int checkExploringProgress() {
 
 void TavernQuest()
 {
-	if (my_level() >= 3)
-	{
+	if (my_level() >= 3) {
         council();
 
 		if (contains_text(visit_url("questlog.php?which=1"),"Ooh, I Think I Smell a Rat"))	{
@@ -47,17 +46,12 @@ void TavernQuest()
 
 			visit_url("tavern.php?place=barkeep");
 			council();
-		}
-		else if (contains_text(visit_url("questlog.php?which=2"),"Ooh, I Think I Smell a Rat"))	{
+		} else if (contains_text(visit_url("questlog.php?which=2"),"Ooh, I Think I Smell a Rat")) {
 			print_quest_complete("You have already completed the level 3 quest.");
-		}
-		else
-		{
+		} else {
 			print_warning("The level 3 quest is not currently available.");
 		}
-	}
-	else
-	{
+	} else {
 		print_not_qualified("You must be at least level 3 to attempt this quest.");
 	}
 }

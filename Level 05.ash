@@ -7,8 +7,7 @@ boolean haveHaremOutfit() {
 
 void GoblinQuest()
 {
-	if (my_level() >= 5)
-	{
+	if (my_level() >= 5) {
         council();
 
 		if (contains_text(visit_url("questlog.php?which=1"),"The Goblin Who Wouldn't Be King"))	{
@@ -22,6 +21,7 @@ void GoblinQuest()
 				print_goal_complete("Cobb's Knob is already available.");
 			}
 
+			set_backup_state();
 			if(!haveHaremOutfit()) {
 				print_goal("Search for harem outfit.");
 				fulfill_condition("haveHaremOutfit",$location[Cobb's Knob Harem]);
@@ -54,18 +54,12 @@ void GoblinQuest()
 			}
 	
 			council();
-		}
-		else if (contains_text(visit_url("questlog.php?which=2"),"The Goblin Who Wouldn't Be King"))
-		{
+		} else if (contains_text(visit_url("questlog.php?which=2"),"The Goblin Who Wouldn't Be King")) {
 			print_quest_complete("You have already completed the level 5 quest.");
-		}
-		else
-		{
+		} else {
 			print_warning("The level 5 quest is not currently available.");
 		}
-	}
-	else
-	{
+	} else {
 		print_not_qualified("You must be at least level 5 to attempt this quest.");
 	}
 }

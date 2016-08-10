@@ -75,13 +75,16 @@ boolean check_beaten_up() {
 	return (!get_recklessness() && (have_effect($effect[Beaten Up])>0));
 }
 
+void res_abort(string message) {
+	get_backup_state();
+	abort(message);
+}
+
 void while_abort() {
 	if (my_adventures() == 0){
-		get_backup_state();
-		abort("Ran out of adventures.");
+		res_abort("Ran out of adventures.");
 	} else if(check_beaten_up()) {
-		get_backup_state();
-		abort("You are not reckless enough to adventure after having your ass whoop'd.");
+		res_abort("You are not reckless enough to adventure after having your ass whoop'd.");
 	}
 }
 
@@ -104,9 +107,9 @@ boolean have_saucepan() {
 	return false;
 }
 
-void open_pvp() {
+void run_pvp() {
 	if(contains_text(visit_url("campground.php"),"hippystone.gif")) {
-		visit_url("campground.php?pwd&smashstone=Yep.&confirm=checked");
+		visit_url("campground.php?pwd&smashstone=Yep.&confirm");
 	}
 }
 
@@ -137,6 +140,7 @@ string run_choice( string page_text ) {
 		
 		if( choice_num == "" ) abort( "Unsupported Choice Adventure!" );
 		
+		print_debug("@run_choice, choice "+choice_adv_num+", option "+choice_num);
 		string url = "choice.php?pwd&whichchoice=" + choice_adv_num + "&option=" + choice_num;
 		page_text = visit_url( url );
 	}
@@ -191,7 +195,7 @@ void maximize_resist() {
 		use_skill(1,$skill[ghostly shell]);
 	}*/
 	
-	maximize("all resistance", get_recklessness());
+	maximize("all resistance", !get_recklessness());
 }
 
 void maximize_item() {
@@ -200,7 +204,7 @@ void maximize_item() {
 	} else if(have_familiar($familiar[Gelatinous Cubeling])) {
 		use_familiar($familiar[Gelatinous Cubeling]);
 	}
-	maximize("item drop",get_recklessness());
+	maximize("item drop",!get_recklessness());
 }
 
 void maximize_meat() {
@@ -209,16 +213,35 @@ void maximize_meat() {
 	} else if(have_familiar($familiar[Leprechaun])) {
 		use_familiar($familiar[Leprechaun]);
 	}
-	maximize("meat drop",get_recklessness());
+	maximize("meat drop",!get_recklessness());
+}
+
+void maximize_init() {
+	if(have_familiar($familiar[Oily Woim])) {
+		use_familiar($familiar[Oily Woim]);
+	} else if(have_familiar($familiar[Xiblaxian Holo-Companion])) {
+		use_familiar($familiar[Xiblaxian Holo-Companion]);
+	}
+	
+	maximize("initiative",!get_recklessness());
 }
 
 void maximize_strength() {
+	change_mcd(0);
 	if(in_hardcore()) {
 		if (have_familiar($familiar[Adorable Space Buddy])) {
 			use_familiar($familiar[Adorable Space Buddy]);
 		}
 	}
-	maximize("mainstat",true);
+	maximize("mainstat",false);
+}
+
+void maximize_ml() {
+	change_mcd(max_mcd());
+	if(have_familiar($familiar[Purse Rat])) {
+		use_familiar($familiar[Purse Rat]);
+	}
+	maximize("ml",!get_recklessness());
 }
 
 void maximize_noncom() {
@@ -226,14 +249,14 @@ void maximize_noncom() {
 		print_minor_warning("Familiar detrimental to progress.");
 		use_familiar($familiar[Mosquito]);
 	}
-	maximize("-combat",get_recklessness());
+	maximize("-combat",!get_recklessness());
 }
 
 void maximize_com() {
 	if(have_familiar($familiar[Jumpsuited Hound Dog])) {
 		use_familiar($familiar[Jumpsuited Hound Dog]);
 	}
-	maximize("+combat",get_recklessness());
+	maximize("+combat",!get_recklessness());
 }
 
 void maximize_cold() {
@@ -241,7 +264,15 @@ void maximize_cold() {
 		use_familiar($familiar[Exotic Parrot]);
 	}
 	
-	maximize("cold resistance", get_recklessness());
+	maximize("cold resistance", !get_recklessness());
+}
+
+void maximize_stench() {
+	if (have_familiar($familiar[Exotic Parrot])) {
+		use_familiar($familiar[Exotic Parrot]);
+	}
+	
+	maximize("stench resistance", !get_recklessness());
 }
 
 void maximize_for_ghost(){
@@ -272,13 +303,13 @@ void maximize_for_ghost(){
 		}
 	}
 	
-	maximize("maximum hp, cold resistance, spooky resistance", get_recklessness());
+	maximize("maximum hp, cold resistance, spooky resistance", !get_recklessness());
 	
 	int checker = check_survive_clue();
 	if(checker>0) {
 		if(my_maxhp()-my_hp()>checker) restore_hp(my_maxhp()-checker+1);
 	} else {
-		abort("You need "+(-checker+1)+"more max hp to clear it with clue.");
+		res_abort("You need "+(-checker+1)+"more max hp to clear it with clue.");
 	}
 }
 
@@ -315,22 +346,22 @@ void obtain_outfit(string outfit, location loc) {
 void custom_fight(string cond, string exec) {
 	print_debug("@custom_fight_with_exec condition:"+cond+"|exec:"+exec);
 	while(!call boolean cond()) {
-		while_abort();
 		restore_hp(0);
 		restore_mp(0);
 		burn_mp();
 		call string exec();
+		while_abort();
 	}
 }
 
 void custom_fight(string cond, string exec, boolean param) {
 	print_debug("@custom_fight_with_exec condition:"+cond+"|exec:"+exec+"|param:"+to_string(param));
 	while(!call boolean cond()) {
-		while_abort();
 		restore_hp(0);
 		restore_mp(0);
 		burn_mp();
 		call string exec(param);
+		while_abort();
 	}
 }
 
@@ -354,17 +385,17 @@ void fulfill_condition(string cond, string add_exec, location loc) {
 void open_location(string parent_url, string loc, location place) {
 	print_debug("@open_location parentUrl:"+parent_url+"|fingerprint:"+loc+"|location:"+to_string(place));
 	while(!contains_text(visit_url(parent_url),loc)) {
-		while_abort();
 		adventure(1,place);
+		while_abort();
 	}
 }
 
 void open_location(string parent_url, string loc, string add_exec, location place) {
 	print_debug("@open_location_with_exec parentUrl:"+parent_url+"|fingerprint:"+loc+"|add_exec:"+add_exec+"|location:"+to_string(place));
 	while(!contains_text(visit_url(parent_url),loc)) {
-		while_abort();
 		adventure(1,place);
 		call add_exec();
+		while_abort();
 	}
 }
 
@@ -375,9 +406,22 @@ boolean test() {
 // DAILY FUNCTION
 
 void use_still() {
+	if(my_primestat()!=$stat[moxie]) {
+		print_minor_warning("You don't have access to the still.");
+		return;
+	}
 	string page = visit_url("shop.php?whichshop=still");
+	if(contains_text(page,"The still is all tapped out for the day.")) {
+		print_minor_warning("Out of converting juice. Return tomorrow.");
+		return;
+	}
+	int pos = index_of(page,"bright green lights on it.")-3;
+	int convert_remaining = to_int(substring(page,pos,pos+3));
+	if(item_amount($item[soda water])<convert_remaining) {
+		buy(convert_remaining-item_amount($item[soda water]),$item[soda water]);
+		visit_url("shop.php?whichshop=still&action=buyitem&quantity="+convert_remaining+"&whichrow=279&pwd");
+	}
 }
-
 
 boolean acquire_token() {
 	int token_amount = item_amount($item[fat loot token]);
@@ -410,7 +454,7 @@ boolean acquire_token() {
 	}
 	get_backup_state();
 	if(token_amount==item_amount($item[fat loot token])) {
-		abort("Token acquired today. Try tomorrow, or pull game magazine!");
+		print_minor_warning("Token acquired today. Try tomorrow, or pull game magazine!");
 		return false;
 	} else {
 		return true;
@@ -420,13 +464,12 @@ boolean acquire_token() {
 void main()
 {
 	vprint("Used for testing new function and config.","blue",1);
-	open_pvp();
-	acquire_token();
 	boolean choice = user_confirm("Do you wish to be reckless and (maybe) get your ass beaten?");
-	set_recklessness(choice);
 	vprint("Recklessness: " + choice,"blue",1);
-	//string func = "test";
-	//fulfill_condition("test",$location[The Thinknerd Warehouse]);
+	set_recklessness(choice);
+	//run_pvp();
+	acquire_token();
+	use_still();
 }
 
 // DEPRECATED

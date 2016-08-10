@@ -1,5 +1,4 @@
 import <QuestLib.ash>;
-import <zlib.ash>;
 
 boolean lastMonsterBossNook() {
 	return last_monster()==$monster[giant skeelton];
@@ -17,12 +16,13 @@ string olfactHandling() {
 	
 	if(contains_text(page,"Combat")) {
 		if(contains_text(page,"dirty old lihc") && have_effect($effect[On The Trail])==0) {
-			page = use_skill();
+			page = use_skill($skill[transcendent olfaction]);
 		}
 		page = run_combat();
 	} else {
 		page = run_choice(page);
 	}
+	return page;
 }
 
 boolean lastMonsterBossCranny() {
@@ -35,8 +35,7 @@ boolean lastMonsterBossAlcove() {
 
 void CyrptQuest()
 {
-    if (my_level() >= 7)
-	{
+    if (my_level() >= 7) {
         council();
 
 		if (contains_text(visit_url("questlog.php?which=1"),"Cyrptic Emanations")) {
@@ -45,7 +44,9 @@ void CyrptQuest()
 
 			if(contains_text(visit_url("crypt.php"),"ul.gif")) {
 				print_goal("undefiling Nook..");
+				maximize_item();
 				fulfill_condition("lastMonsterBossNook","helpWithNook",$location[The Defiled Nook]);
+				get_backup_state();
 			} else {
 				print_goal_complete("Nook already undefiled. Moving on");
 			}
@@ -60,7 +61,9 @@ void CyrptQuest()
 			if(contains_text(visit_url("crypt.php"),"ll.gif")) {
 				print_goal("undefiling Cranny..");
 				set_choices(523,4);
+				maximize_ml();
 				fulfill_condition("lastMonsterBossCranny",$location[The Defiled Cranny]);
+				get_backup_state();
 			} else {
 				print_goal_complete("Cranny already undefiled. Moving on");
 			}
@@ -91,18 +94,12 @@ void CyrptQuest()
 	
 			get_backup_state();
 			council();
-		}
-		else if (contains_text(visit_url("questlog.php?which=2"),"Cyrptic Emanations"))
-		{
+		} else if (contains_text(visit_url("questlog.php?which=2"),"Cyrptic Emanations")) {
 			print_quest_complete("You have already completed the level 7 quest.");
-		}
-		else
-		{
+		} else {
 			print_warning("The level 7 quest is not currently available.");
 		}
-	}
-	else
-	{
+	} else {
 		print_not_qualified("You must be at least level 7 to attempt this quest.");
 	}
 }

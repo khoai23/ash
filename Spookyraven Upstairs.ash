@@ -43,82 +43,72 @@ void SpookyravenUpstairs()
 	if(contains_text(visit_url("place.php?whichplace=manor2"),"manor2_ladys")) {
 		visit_url("place.php?whichplace=manor2&action=manor2_ladys");
 		set_bedroom_choices();
+		cli_execute("conditions clear");
 		if (!have_item($item[Lord Spookyraven's spectacles]))
 		{
-			vprint("Searching for spectacles","olive",5);
-			cli_execute("conditions clear");
-			add_item_condition(1, $item[Lord Spookyraven's spectacles]);
-			adventure(my_adventures(), $location[The Haunted Bedroom]);
+			print_goal("Searching for spectacles");
+			obtain(1, $item[Lord Spookyraven's spectacles], $location[The Haunted Bedroom]);
 			set_bedroom_choices();
 		} else {
-			vprint("Spectacles acquired.","green",1);
+			print_goal_complete("Spectacles acquired.");
 		}
 
 		if(!have_item($item[Lady Spookyraven's finest gown])) {
-			vprint("Searching for gown","olive",5);
-			cli_execute("conditions clear");
-			add_item_condition(1, $item[Lady Spookyraven's finest gown]);
-			adventure(my_adventures(), $location[The Haunted Bedroom]);
+			print_goal("Searching for gown");
+			obtain(1, $item[Lady Spookyraven's finest gown], $location[The Haunted Bedroom]);
 		} else {
-			vprint("Gown acquired. Skipping Bedroom.","green",1);
+			print_goal_complete("Gown acquired. Skipping Bedroom.");
 		}
 		
 		if(!have_item($item[Lady Spookyraven's powder puff])) {
-			vprint("Searching for puff","olive",5);
-			cli_execute("conditions clear");
-			add_item_condition(1, $item[Lady Spookyraven's powder puff]);
-			adventure(my_adventures(), $location[The Haunted Bathroom]);
+			print_goal("Searching for puff");
+			obtain(1, $item[Lady Spookyraven's powder puff], $location[The Haunted Bathroom]);
 		} else {
-			vprint("Puff acquired. Skipping Bathroom.","green",1);
+			print_goal_complete("Puff acquired. Skipping Bathroom.");
 		}
 		
 		if(!have_item($item[Lady Spookyraven's dancing shoes])) {
-			vprint("Searching for shoes","olive",5);
-			cli_execute("conditions clear");
-			add_item_condition(1, $item[Lady Spookyraven's dancing shoes]);
-			adventure(my_adventures(), $location[The Haunted Gallery]);
+			print_goal("Searching for shoes");
+			obtain(1, $item[Lady Spookyraven's dancing shoes], $location[The Haunted Gallery]);
 		} else {
-			vprint("Shoes acquired. Skipping Gallery.","green",1);
+			print_goal_complete("Shoes acquired. Skipping Gallery.");
 		}
 		
-		vprint("Bring items to ghost","olive",5);
+		print_goal("Bring items to ghost");
 		visit_url("place.php?whichplace=manor2&action=manor2_ladys");
 	} else {
-		vprint("The second floor was cleared.","green",1);
+		print_quest_complete("The second floor was cleared.");
 	}
+}
 
+void GuyMadeOfBeeQuest() {
 	int guyMadeOfBeesCount = get_property("guyMadeOfBeesCount").to_int();
 
 	if (guyMadeOfBeesCount < 4 && 
 		user_confirm("Would you like to prep the guy made of bees? You have said his name " + guyMadeOfBeesCount + " time(s)."))
 	{
 		if (!have_item($item[antique hand mirror]))	{
-			vprint("Searching for mirror","olive",5);
+			print_goal("Searching for mirror");
 			set_bedroom_choices();
-			cli_execute("conditions clear");
-			add_item_condition(1, $item[antique hand mirror]);
-			adventure(my_adventures(), $location[The Haunted Bedroom]);
+			obtain(1, $item[antique hand mirror], $location[The Haunted Bedroom]);
 		}
 
-		if (guyMadeOfBeesCount < 4)
-		{
+		if (guyMadeOfBeesCount < 4) {
+			print_goal("Preparing the BeeGee for the upcoming quest.");
 			while(guyMadeOfBeesCount<4) {
 				while_abort();
 				adventure(1, $location[The Haunted Bathroom]);
 				guyMadeOfBeesCount = get_property("guyMadeOfBeesCount").to_int();
 			}
 		} else {
-			vprint("You have already said the Guy Made of Bees' name " + guyMadeOfBeesCount + " times already, he's ready to be summoned.","blue",1);
+			print_goal_complete("You have already said the Guy Made of Bees' name " + guyMadeOfBeesCount + " times already, he's ready to be summoned.");
 		}
+	} else if (guyMadeOfBeesCount == 4) {
+		print_quest_complete("You have prepared the Guy Made of Bees.");
+	} else {
+		print_not_qualified("You consciously ignore the BeeGee.");
 	}
-	else
-	{
-		if (guyMadeOfBeesCount == 4) {
-			vprint("You have prepared the Guy Made of Bees.","green",1);
-		} else {
-			vprint("You don't care about the Guy Made of Bees.","black",1);
-		}
-	}
+	
 }
 
 void main()

@@ -42,7 +42,7 @@ void TrapperQuest()
 				}
 				
 				if(item_amount(ore) < 3) {
-					if(pulls_remaining()>=3 && user_confirm("Would you like to pull"+ore_name+"?")) {
+					if(pulls_remaining()>=3 && user_confirm("Would you like to pull "+to_string(ore)+"?")) {
 						// pull ore, will purchase if not enough
 						print_goal("Pull ore from storage.");
 						if((storage_amount(ore) + item_amount(ore)) < 3) {
@@ -63,8 +63,11 @@ void TrapperQuest()
 				}
 				
 				if(item_amount($item[goat cheese]) < 3) {
+					set_backup_state();
 					print_goal("Farming for cheese.");
+					maximize_item();
 					obtain(3,$item[goat cheese],$location[The Goatlet]);
+					get_backup_state();
 				} else {
 					print_goal_complete("Have enough cheese.");
 				}
@@ -86,9 +89,9 @@ void TrapperQuest()
 					if(have_item($item[ninja carabiner]) && have_item($item[ninja crampons]) && have_item($item[ninja rope])) {
 						print_goal_complete("Already have ninja climbing set.");
 					} else if(pulls_remaining() >= 3 && user_confirm("Pulling ninja climbing set?")) {
-						if(!have_item($item[ninja carabiner])) take_storage($item[ninja carabiner]);
-						if(!have_item($item[ninja crampons])) take_storage($item[ninja crampons]);
-						if(!have_item($item[ninja rope])) take_storage($item[ninja rope]);
+						if(!have_item($item[ninja carabiner])) take_storage(1,$item[ninja carabiner]);
+						if(!have_item($item[ninja crampons])) take_storage(1,$item[ninja crampons]);
+						if(!have_item($item[ninja rope])) take_storage(1,$item[ninja rope]);
 					} else {
 						print_minor_warning("Attempt to raise combat rate, may gimp your combat capacity.");
 						maximize_com();
@@ -150,18 +153,12 @@ void TrapperQuest()
 			visit_url("place.php?whichplace=mclargehuge&action=trappercabin");
 	
 			council();
-		}
-		else if (contains_text(visit_url("questlog.php?which=2"),"Am I My Trapper's Keeper?"))
-		{
+		} else if (contains_text(visit_url("questlog.php?which=2"),"Am I My Trapper's Keeper?")) {
 			print_quest_complete("You have already completed the level 8 quest.");
-		}
-		else
-		{
+		} else {
 			print_warning("The level 8 quest is not currently available.");
 		}
-	}
-	else
-	{
+	} else {
 		print_not_qualified("You must be at least level 8 to attempt this quest.");
 	}
 }

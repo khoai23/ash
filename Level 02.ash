@@ -5,6 +5,7 @@ boolean larva = false;
 boolean templeMap = true;
 
 string searchWood(boolean target) {
+	set_backup_state();
 	buffer page = visit_url("adventure.php?snarfblat=15");
 	
 	if(contains_text(page,"Combat")) {
@@ -52,6 +53,7 @@ void MosquitoQuest()
         council();
 
 		if (contains_text(visit_url("questlog.php?which=1"),"Looking for a Larva in All the Wrong Places"))	{
+			set_backup_state();
 			if (!haveLarva()) {
 				print_goal("Using custom searcher to find larva.");
 				custom_fight("haveLarva","searchWood",larva);
@@ -82,7 +84,9 @@ boolean reachHiddenTemple() {
 
 void OpenTemple() {
 	if(!reachHiddenTemple()) {
+		set_backup_state();
 		print_goal("Searching for map and associating items..");
+		maximize_noncom();
 		custom_fight("reachHiddenTemple","searchWood",templeMap);
 	} else {
 		print_quest_complete("The path to the Hidden Temple is already opened.");
