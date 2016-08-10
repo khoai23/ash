@@ -15,6 +15,10 @@ boolean skiingDone() {
 	return get_last_encounter() == "3 eXXXtreme 4ever 6pack";
 }
 
+boolean haveAllNinjaGear() {
+	return have_item($item[ninja rope]) && have_item($item[ninja carabiner]) && have_item($item[ninja crampons]);
+}
+
 void TrapperQuest()
 {
     if (my_level() >= 8) {
@@ -89,10 +93,7 @@ void TrapperQuest()
 						print_minor_warning("Attempt to raise combat rate, may gimp your combat capacity.");
 						maximize_com();
 						print_goal("Searching for ninja gear.");
-						while(item_amount($item[ninja carabiner])==0 || item_amount($item[ninja crampons])==0 || item_amount($item[ninja rope])==0) {
-							while_abort();
-							adventure(1,$location[Lair of the Ninja Snowmen]);
-						}
+						fulfill_condition("haveAllNinjaGear",$location[Lair of the Ninja Snowmen]);
 					}
 				} else {
 					// default skiing - searching for outfit

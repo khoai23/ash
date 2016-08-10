@@ -1,6 +1,6 @@
 import <QuestLib.ash>;
 
-int checkTwinPeakProgress() {
+boolean checkTwinPeakProgress() {
 	int twinPeakProgress = to_int(get_property("twinPeakProgress"));
 	if((twinPeakProgress & 1) == 0) {
 		if(elemental_resistance($element[stench]) < 40.0) {
@@ -19,16 +19,14 @@ int checkTwinPeakProgress() {
 		}
 		set_choices(606,1);
 		set_choices(607,1);
-		return 1;
 	} else if((twinPeakProgress & 2) == 0) {
 		if((item_drop_modifier() < 50 && have_effect($effect[Brother Flying Burrito's Blessing])==0) || (item_drop_modifier() < 20)) {
 			abort("Ready for choice 2, but not enough +item.");
 		}
 		set_choices(606,2);
 		set_choices(608,1);
-		return 2;
 	} else if((twinPeakProgress & 4) == 0) {
-		if(item_amount($item[Jar of Oil]) == 0) {
+		if(!have_item($item[Jar of Oil])) {
 			if(!use(12,$item[bubblin' crude])) {	
 				abort("Ready for choice 3, but not enough oil piece to make jar of oil.");
 			}
@@ -36,10 +34,9 @@ int checkTwinPeakProgress() {
 		set_choices(606,3);
 		set_choices(609,1);
 		set_choices(616,1);
-		return 3;
 	} else if(twinPeakProgress == 7) {
 		if(initiative_modifier()<40) {
-			if(item_amount($item[Lord Spookyraven's ear trumpet])>0) {
+			if(have_item($item[Lord Spookyraven's ear trumpet])) {
 				equip($slot[acc3],$item[Lord Spookyraven's ear trumpet]);
 			}
 		}
@@ -49,13 +46,12 @@ int checkTwinPeakProgress() {
 		set_choices(606,4);
 		set_choices(610,1);
 		set_choices(617,1);
-		return 4;
 	} else if(twinPeakProgress>7){
 		set_choices(606,0);
-		return 5;
 	} else {
-		return 6;
+		abort("Something had messed up the variable. Aborting.");
 	}
+	return contains_text(visit_url("place.php?whichplace=highlands"),"fire2.gif");
 }
 
 boolean bridgeComplete() {
@@ -82,103 +78,72 @@ void LOLQuest()
 	{
 		council();
 
-		if (contains_text(visit_url("questlog.php?which=1"),"There Can Be Only One Topping"))
-		{
-			if (!contains_text(visit_url("place.php?whichplace=orc_chasm"),"cross_chasm.gif"))
-			{
+		if (contains_text(visit_url("questlog.php?which=1"),"There Can Be Only One Topping")) {
+		
+			if (!contains_text(visit_url("place.php?whichplace=orc_chasm"),"cross_chasm.gif")) {
 
-				if ((available_amount($item[abridged dictionary]) == 0) && (available_amount($item[bridge]) == 0))
-				{
-					
+				if ((!have_item($item[abridged dictionary])) && (!have_item($item[bridge]))) {
 					if(contains_text(visit_url("forestvillage.php"),"ut_cottage_quest.gif")) {
-						vprint("Helping the untinker..","olive",5);
+						print_goal("Agree to help the untinker.");
 						visit_url("place.php?whichplace=forestvillage&action=fv_untinker_quest&preaction=screwquest");
 					}
 					if(contains_text(visit_url("questlog.php?which=1"),"Driven Crazy")) {
-						vprint("Search for screwdriver","olive",5);
+						print_goal("Search for screwdriver.");
 						obtain(1,$item[rusty screwdriver],$location[The Degrassi Knoll Garage]);
 						visit_url("place.php?whichplace=forestvillage&action=fv_untinker");
 					}
-					
-					if ((!have_outfit("swashbuckling getup") || !is_wearing_outfit("swashbuckling getup")))
-					{	
-						if(!user_confirm("Would you like to adventure for the swashbuckling getup?")) {
-							abort("Nice attitude. Please keep your ass on your thumbs.");
-						}
-						vprint("Search for pirate outfit","olive",5);
-						while(!have_outfit("swashbuckling getup"))
-							adventure(1, $location[The Obligatory Pirate's Cove]);
-					}
+					obtain_outfit("swashbuckling getup",$location[The Obligatory Pirate's Cove]);
 	
-					cli_execute("checkpoint");
+					set_backup_state();
 					if(item_amount($item[pirate fledges])>0 && can_equip($item[pirate fledges])) {
 						equip($slot[acc3],$item[pirate fledges]);
-					}
-					else if (have_outfit("swashbuckling getup"))
-					{
+					} else if (have_outfit("swashbuckling getup")) {
 						outfit("swashbuckling getup");
 					} 
 					
 					if(contains_text(visit_url("shop.php?whichshop=bartlebys"),"abridged")) {
 						buy(1, $item[abridged dictionary]);
 					} else {
-						vprint("Dictionary already purchased.", "red",1);
+						print_not_qualified("Dictionary already purchased.");
 					}
 					
-					cli_execute("outfit checkpoint");
+					get_backup_state();
 				}
 				
-				if (available_amount($item[abridged dictionary]) > 0)
-				{
+				if (have_item($item[abridged dictionary])) {
 					cli_execute("untinker abridged dictionary");
 				}
 				visit_url("place.php?whichplace=orc_chasm&action=label1");
 				
+				print_goal("Building a bridge through the chasm.");
 				fulfill_condition("bridgeComplete","buildBridge",$location[The Smut Orc Logging Camp]);
-				/*
-				while(!bridgeComplete()) {
-					while_abort();
-					adventure(1,$location[The Smut Orc Logging Camp]);
-					visit_url("place.php?whichplace=orc_chasm&action=bridge"+get_property("chasmBridgeProgress"));
-					vprint("Trace progress: " + get_property("chasmBridgeProgress"),"olive",5);
-				}
-				*/
 				
 			} else {
-				vprint("Bridge finished. Continuing to next part of the quest..","green",1);
+				print_quest_complete("Bridge finished. Continuing to next part of the quest..");
 			}
 			
 			visit_url("place.php?whichplace=highlands&action=highlands_dude");
 
 			if (!oilPeakLit()) {
-				vprint("Dealing with oil peak.","olive",5);
+				print_goal("Dealing with oil peak.");
 				fulfill_condition("oilPeakLit",$location[Oil Peak]);
-				cli_execute("use 12 bubblin' crude");
+				//cli_execute("use 12 bubblin' crude");
 			} else {
-				vprint("Oil peak lighted.","green",1);
+				print_goal_complete("Oil peak lighted.");
 			}
 			
-			if (!contains_text(visit_url("place.php?whichplace=highlands"),"fire2.gif")) {
-				vprint("Dealing with twin peak.","olive",5);
-				cli_execute("checkpoint");
-				set_choices(605,1);
-				
-				int choice = checkTwinPeakProgress();
-				while(choice <=4) {
-					choice = checkTwinPeakProgress();
-					if(choice==6) {
-						abort("Something went wrong in Twin Peak script.");
-					}
-					while_abort();
-					adv1($location[Twin Peak],-1,"");
-				}
-				cli_execute("outfit checkpoint");
+			if (!checkTwinPeakProgress()) {
+				print_goal("Dealing with twin peak.");
+				set_backup_state();
+				//set_choices(605,1);
+				fulfill_condition("checkTwinPeakProgress",$location[Twin Peak]);
+				get_backup_state();
 			} else {
-				vprint("Twin peak lighted.","green",1);
+				print_goal_complete("Twin peak lighted.");
 			}
 			
 			if (!contains_text(visit_url("place.php?whichplace=highlands"),"fire1.gif")) {
-				vprint("Dealing with ghost peak.","olive",5);
+				print_goal("Search for clues to light the peak(faster).");
 				
 				int preparation = to_int(get_property("booPeakProgress")) - item_amount($item[a-boo clue])*30;
 				if(preparation>0 && !user_confirm("Have you prepare yourselves to kill ghost?")) {
@@ -186,30 +151,22 @@ void LOLQuest()
 				}
 				
 				fulfill_condition("ghostPeakReady",$location[A-Boo Peak]);
-				/*
-				while(preparation>0) {
-					while_abort();
-					adventure(1,$location[A-Boo Peak]);
-					preparation = to_int(get_property("booPeakProgress")) - item_amount($item[a-boo clue])*30;
-				}
-				*/
 				
-				if(have_item($item[a-boo clue])) {
-					vprint("Prepare for a-boo clues.","olive",5);
-					if(!user_confirm("Are you ready for freezing and scary experiences?")) {
-						abort("Please manually tune your outfit to withstand cold and spooky");
-					}
-					
-					set_choices(611,1);
-				}
-				
+				set_backup_state();
+				maximize_for_ghost();
+				print_goal("Using a-boo clue.");
 				while(have_item($item[a-boo clue])) {
 					while_abort();
 					use(1,$item[a-boo clue]);
 					adventure(1,$location[A-Boo Peak]);
 				}
+				if(to_int(get_property("booPeakProgress"))==0)
+					adventure(1,$location[A-Boo Peak]);
+				else	
+					print_minor_warning("How the hell did you get here?");
+				get_backup_state();
 			} else {
-				vprint("Ghost peak lighted.","green",1);
+				print_goal_complete("Ghost peak lighted.");
 			}
 			
 			visit_url("place.php?whichplace=highlands&action=highlands_dude");
@@ -218,7 +175,7 @@ void LOLQuest()
 		}
 		else if (contains_text(visit_url("questlog.php?which=2"),"There Can Be Only One Topping"))
 		{
-			vprint("You have already completed the level 9 quest.","green",1);
+			print_quest_complete("You have already completed the level 9 quest.");
 		}
 		else
 		{
