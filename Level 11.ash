@@ -19,6 +19,19 @@ answer[0] = "b"; answer[1] = "a"; answer[2] = "n";
 answer[3] = "a"; answer[4] = "n"; answer[5] = "a";
 answer[6] = "s";
 
+void tileSolver(string input) {
+	matcher tileMap = create_matcher("tile\\w+\\.gif",visit_url("main.php"));
+	int count=0;
+	string row;
+	while(find(tileMap)) {
+		if(count%9==0) row = "";
+		count++;
+		row += group(tileMap).char_at(4) + " ";
+		if(count%9==0) print(row);
+		if(count>63) abort("Failed parsing.")
+	}
+}
+
 string hiddenTempleAdventure() {
 	// the function must be run AFTER having the Nostril
 	string page = visit_url("adventure.php?snarfblat=280");
@@ -38,6 +51,7 @@ string hiddenTempleAdventure() {
 		manual_run_choice(123,2);
 		page = visit_url("choice.php");
 		print_debug("Parse the map and get your path.");
+		tileSolver(page);
 		int i = 0;
 		int count = 0;
 		string[63] mapping;
@@ -51,7 +65,7 @@ string hiddenTempleAdventure() {
 		for row from 0 upto 6 {
 			for column from 1 upto 9 {
 				if(mapping[(6-row)*9+column-1]==answer[row]){
-					print_debug("Jump to tile " + column);
+					print("Jump to tile " + column +" row "+ row + " char " + mapping[(6-row)*9+column-1]);
 					visit_url("tiles.php?action=jump&whichtile=" + column);
 					waitq(1);
 					break;

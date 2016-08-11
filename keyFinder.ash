@@ -7,9 +7,9 @@ boolean deityKey() {
 	if(have_item($item[Sneaky Pete's key])) needed+=1;
 	//needed -= item_amount($item[Sneaky Pete's key]);
 	if(needed>=3) {
-		if(!have_item($item[Boris's key])) buy(1,$item[Boris's key]);
-		if(!have_item($item[Jarlsberg's key])) buy(1,$item[Jarlsberg's key]);
-		if(!have_item($item[Sneaky Pete's key])) buy(1,$item[Sneaky Pete's key]);
+		if(!have_item($item[Boris's key])) buy($item[Boris's key].seller,1,$item[Boris's key]);
+		if(!have_item($item[Jarlsberg's key])) buy($item[Jarlsberg's key].seller,1,$item[Jarlsberg's key]);
+		if(!have_item($item[Sneaky Pete's key])) buy($item[Sneaky Pete's key].seller,1,$item[Sneaky Pete's key]);
 		return true;
 	} if(needed==2) {
 		if(acquire_token()) return true;

@@ -19,17 +19,24 @@ void open_Basement () {
 	} else if(item_amount($item[amulet of extreme plot significance])>0) {
 		print_debug("Set choice to return later - amulet");
 		set_choices(670,5);
-		print_goal("Have amulet. Ready for parachuting.");
+		print_goal("Have amulet. Finding secret compartment.");
 	} 
 	set_choices(671,4);
 	if(item_amount($item[titanium assault umbrella])>0) {
 		print_debug("Set choice to return later - umbrella");
 		set_choices(669,4);
-		print_goal("Have umbrella. Finding secret compartment.");
+		print_goal("Have umbrella. Ready for parachuting.");
 	} 
+	if(have_item($item[massive dumbbell])) {
+		print_debug("Set choice to dumbbell placing - bypass umbrella.");
+		set_choices(671,1);
+		set_choices(669,1);
+		print_goal("Have dumbbell. Time for leveling.");
+	}
 	
 	int lastAdv = checkBasementNoncombat();
 	print_goal("Adventure in the basement.");
+	boolean dumbbellUse = false;
 	while(lastAdv!=4) {
 		while_abort();
 		adv1($location[The Castle in the Clouds in the Sky (Basement)]);
@@ -47,10 +54,14 @@ void open_Basement () {
 			adv1($location[The Castle in the Clouds in the Sky (Basement)]);	
 			break;
 		} else if(have_item($item[massive dumbbell])) {
+			dumbbellUse = true;
 			print_debug("Have dumbbell, changing choice.");
 			set_choices(671,1);
 			set_choices(669,1);
 			set_choices(670,3);
+		} else if(dumbbellUse && !have_item($item[massive dumbbell])) {
+			print_debug("Used dumbbell.");
+			break;
 		} else {
 			print_debug("Waiting until meet a choice.");
 		}

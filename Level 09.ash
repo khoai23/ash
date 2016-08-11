@@ -87,7 +87,8 @@ void LOLQuest()
 					}
 					if(contains_text(visit_url("questlog.php?which=1"),"Driven Crazy")) {
 						print_goal("Search for screwdriver.");
-						obtain(1,$item[rusty screwdriver],$location[The Degrassi Knoll Garage]);
+						if(!knoll_available()) obtain(1,$item[rusty screwdriver],$location[The Degrassi Knoll Garage]);
+						else visit_url("place.php?whichplace=knoll_friendly&action=dk_innabox");
 						visit_url("place.php?whichplace=forestvillage&action=fv_untinker");
 					}
 					obtain_outfit("swashbuckling getup",$location[The Obligatory Pirate's Cove]);
@@ -124,7 +125,10 @@ void LOLQuest()
 
 			if (!oilPeakLit()) {
 				print_goal("Dealing with oil peak.");
+				set_backup_state();
+				maximize_ml();
 				fulfill_condition("oilPeakLit",$location[Oil Peak]);
+				get_backup_state();
 				//cli_execute("use 12 bubblin' crude");
 			} else {
 				print_goal_complete("Oil peak lighted.");
@@ -148,9 +152,10 @@ void LOLQuest()
 					abort("Please make your preparation and come again.");
 				}
 				
+				set_backup_state();
+				maximize_item();
 				fulfill_condition("ghostPeakReady",$location[A-Boo Peak]);
 				
-				set_backup_state();
 				maximize_for_ghost();
 				print_goal("Using a-boo clue.");
 				while(have_item($item[a-boo clue])) {
@@ -159,7 +164,7 @@ void LOLQuest()
 					adventure(1,$location[A-Boo Peak]);
 				}
 				if(to_int(get_property("booPeakProgress"))==0)
-					adventure(1,$location[A-Boo Peak]);
+					adv1($location[A-Boo Peak]);
 				else	
 					print_minor_warning("How the hell did you get here?");
 				get_backup_state();
@@ -173,10 +178,10 @@ void LOLQuest()
 		} else if (contains_text(visit_url("questlog.php?which=2"),"There Can Be Only One Topping")) {
 			print_quest_complete("You have already completed the level 9 quest.");
 		} else {
-			vprint("The level 9 quest is not currently available.","black",1);
+			print_warning("The level 9 quest is not currently available.");
 		}
 	} else {
-		vprint("You must be at least level 9 to attempt this quest.","red",1);
+		print_not_qualified("You must be at least level 9 to attempt this quest.");
 	}
 }
 

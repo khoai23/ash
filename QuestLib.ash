@@ -19,7 +19,7 @@ void print_warning(string message) {
 	print_warning(message,main_quest_info);
 }
 void print_minor_warning(string message) {
-	vprint("Minor:" + message,"red",action_directive);
+	vprint("Minor:" + message,"red",quest_directive);
 }
 void print_quest_complete(string message) {
 	vprint("Quest:" + message,"green",main_quest_info);
@@ -28,10 +28,13 @@ void print_goal(string message) {
 	vprint("Goal:" + message,"blue",quest_directive);
 }
 void print_goal_complete(string message) {
-	vprint("Goal:" + message,"green",main_quest_info);
+	vprint("Goal:" + message,"green",quest_directive);
 }
 void print_debug(string message) {
 	vprint(message,"olive",debug_info);
+}
+void print_combat_info(string message) {
+	vprint("Combat:" + message,"magenta",action_directive);
 }
 void print_not_qualified(string message) {
 	vprint("Fail:" + message,"maroon",main_quest_info);
@@ -147,41 +150,6 @@ string run_choice( string page_text ) {
 	return page_text;
 }
 
-boolean find_adventure(string text, location loc, int adv) {
-	string page = "";
-	string url = loc.to_url();
-	int i = 0;
-
-	text = text.to_lower_case();
-
-	while (my_adventures() > 0 && url > 0)
-	{
-		page = visit_url(url);
-
-		if (page.contains_text("Combat"))
-		{
-			page = run_combat();
-		}
-		else if (page.contains_text("choice.php"))
-		{                                                    
-			page = run_choice(page);
-		}
-
-		page = page.to_lower_case();
-
-        i = i + 1;
-
-		if (page.contains_text(text))
-		{
-			return true;
-		}
-
-		adv = adv - 1;
-	}
-
-	return false;
-}
-
 // CHANGE FUNCTION
 
 void maximize_resist() {
@@ -217,10 +185,10 @@ void maximize_meat() {
 }
 
 void maximize_init() {
-	if(have_familiar($familiar[Oily Woim])) {
-		use_familiar($familiar[Oily Woim]);
-	} else if(have_familiar($familiar[Xiblaxian Holo-Companion])) {
+	if(have_familiar($familiar[Xiblaxian Holo-Companion])) {
 		use_familiar($familiar[Xiblaxian Holo-Companion]);
+	} else if(have_familiar($familiar[Oily Woim])) {
+		use_familiar($familiar[Oily Woim]);
 	}
 	
 	maximize("initiative",!get_recklessness());

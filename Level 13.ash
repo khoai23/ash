@@ -17,7 +17,7 @@ void confrontSorceress(boolean haveWand) {
 	run_macro(macroId);
 	string page=visit_url("fight.php");
 	if(!contains_text(page,"You wake up in a heap")) {
-		vprint("Allow wand searching in cemetery.","olive",5);
+		vprint("Allow wand searching in cemetery.");
 		visit_url("choice.php");
 		manual_run_choice(1016,1);
 	}
@@ -65,10 +65,10 @@ void shadowKilling() {
 			if(have_item($item[scented massage oil])) heal_choice = $item[scented massage oil];
 			else heal_choice = $item[soggy used band-aid];
 			if(my_hp()<max_shadow_attack) { 
-				vprint("Heal now for maximum effect.","blue",5);
+				print_combat_info("Heal now for maximum effect.");
 				page=throw_item(heal_choice);
 			} else {
-				vprint("Wait for lower health.","black",5);
+				print_combat_info("Wait for lower health.");
 				page=throw_item($item[spectre scepter]);
 			}
 		} else {
@@ -76,7 +76,7 @@ void shadowKilling() {
 			else if(have_item($item[gauze garter])) heal_choice = $item[gauze garter];
 			else heal_choice = $item[filthy poultice];
 			if(my_maxhp()-my_hp() > 240 && have_skill($skill[Ambidextrous Funkslinging])) {
-				vprint("Funkslinging items.","blue",5);
+				print_combat_info("Funkslinging items.");
 				if(item_amount(heal_choice)>=2) page=throw_items(heal_choice,heal_choice);
 				else {
 					item second_heal_choice;
@@ -85,10 +85,10 @@ void shadowKilling() {
 					page=throw_items(heal_choice,second_heal_choice);
 				}
 			} else if(my_maxhp() - my_hp() > 120) {
-				vprint("Use single item.","blue",5);
+				print_combat_info("Use single item.");
 				page=throw_item(heal_choice);
 			} else {
-				vprint("Wait for lower health.","black",5);
+				print_combat_info("Wait for lower health.");
 				page=throw_item($item[spectre scepter]);
 			}
 		}
@@ -102,7 +102,7 @@ void NaughtyQuest() {
 		string page;
 		if (contains_text(visit_url("questlog.php?which=1"),"The Ultimate Final Epic Conflict of the Ages")) {
 			if(contains_text(visit_url("place.php?whichplace=nstower"),"nstower_regdesk.gif")) {
-				vprint("Dealing with contestants","olive",5);
+				print_goal("Register every contest available.");
 				page = visit_url("place.php?whichplace=nstower&action=ns_01_contestbooth");
 				if(contains_text(page,"Enter the Fastest Adventurer contest")) {
 					page = manual_run_choice(1003,1);
@@ -120,9 +120,9 @@ void NaughtyQuest() {
 					page = manual_run_choice(1003,3);
 				}
 				page = manual_run_choice(1003,6);
-				vprint("Done registering.","blue",1);
+				print_goal_complete("Done registering.");
 				
-				vprint("Ridding this world of pesky contestants!","olive",5);
+				print_goal("Rid this world of pesky contestants!");
 				while(contains_text(visit_url("place.php?whichplace=nstower"),"crowd1.gif")) {
 					while_abort();
 					restore_hp(0);
@@ -145,13 +145,15 @@ void NaughtyQuest() {
 					run_combat();
 				}
 				
-				vprint("Claim your righteous prize.","olive",5);
+				print_goal("Claim your righteous prize.");
 				visit_url("place.php?whichplace=nstower&action=ns_01_contestbooth");
 				page = manual_run_choice(1003,4);
+			} else {
+				print_goal_complete("Dealed with the contest.");
 			}
 			
 			if(contains_text(visit_url("place.php?whichplace=nstower"),"ns_02_coronation")) {
-				abort("get the filename of courtyard image!");
+				abort("Get the filename of courtyard image!");
 				visit_url("place.php?whichplace=nstower&action=ns_02_coronation");
 				manual_run_choice(1020,1);
 				manual_run_choice(1021,1);
@@ -161,9 +163,12 @@ void NaughtyQuest() {
 			if(contains_text(visit_url("place.php?whichplace=nstower"),"nstower_hedgemaze.gif")) {
 				page = visit_url("place.php?whichplace=nstower&action=ns_03_hedgemaze");
 				run_choice(page);
+			} else {
+				print_goal_complete("Passed the hedge.");
 			}
 			
 			if(contains_text(visit_url("place.php?whichplace=nstower"),"nstower_towerdoor.gif")) {
+				print_goal("Open locks on the door.");
 				page = visit_url("place.php?whichplace=nstower_door");
 				if(contains_text(page,"lock_boris.gif")) {
 					borisKey();
@@ -190,6 +195,8 @@ void NaughtyQuest() {
 					visit_url("place.php?whichplace=nstower_door&action=ns_lock6");
 				}
 				visit_url("place.php?whichplace=nstower_door&action=ns_doorknob");
+			}  else {
+				print_goal_complete("Opened the damned door.");
 			}
 			
 			if(contains_text(visit_url("place.php?whichplace=nstower"),"nstower_tower1.gif")) {
@@ -201,6 +208,8 @@ void NaughtyQuest() {
 			}
 			
 			if(contains_text(visit_url("place.php?whichplace=nstower"),"nstower_tower2.gif")) {
+				set_backup_state();
+				maximize_meat();
 				while(contains_text(visit_url("place.php?whichplace=nstower"),"nstower_tower2.gif")) {
 					while_abort();
 					restore_hp(0);
@@ -208,6 +217,7 @@ void NaughtyQuest() {
 					visit_url("place.php?whichplace=nstower&action=ns_06_monster2");
 					run_combat();
 				}				
+				get_backup_state();
 			}
 			
 			if(contains_text(visit_url("place.php?whichplace=nstower"),"nstower_tower3.gif")) {
@@ -236,7 +246,7 @@ void NaughtyQuest() {
 				}
 				
 				if(!have_item($item[Wand of Nagamar])) {
-					vprint("Prepare to get beaten up. You choose it yourself.","red",1);
+					print_minor_warning("Prepare to get beaten up. You choose it yourself.");
 					confrontSorceress(false);
 					wandFinder();
 				}
@@ -246,20 +256,13 @@ void NaughtyQuest() {
 			if(contains_text(visit_url("place.php?whichplace=nstower"),"kingprismanim.gif")) {
 				visit_url("place.php?whichplace=nstower&action=ns_11_prism");
 			}
-			if() {
-				abort("Something went wrong with the script.");
-			}
+		} else if (contains_text(visit_url("questlog.php?which=2"),"The Ultimate Final Epic Conflict of the Ages")) {
+			print_quest_complete("You have already completed the level 13 quest.");
+		} else {
+			print_not_qualified("The level 13 quest is not currently available. You may have not completed all the other quests.");
 		}
-		else if (contains_text(visit_url("questlog.php?which=2"),"The Ultimate Final Epic Conflict of the Ages")) {
-			vprint("You have already completed the level 13 quest.","green",1);
-		}
-		else
-		{
-			vprint("The level 13 quest is not currently available.","black",1);
-		}
-	}
-	else {
-		vprint("You must be at least level 13 to attempt this quest.","red",1);
+	} else {
+		print_not_qualified("You must be at least level 13 to attempt this quest.");
 	}
 }
 void main()
