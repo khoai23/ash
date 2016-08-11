@@ -64,25 +64,21 @@ string beer_pong(string page)
 	insults[8].insult="Not a single man has faced me and lived to tell the tale!";
 	insults[8].retort="It only seems that way because you haven't learned to count to one.";
 
-	while (!page.contains_text("victory laps"))
-	{
+	while (!page.contains_text("victory laps")) {
 		string old_page = page;
 
-		if (!page.contains_text("Insult Beer Pong"))
-		{
+		if (!page.contains_text("Insult Beer Pong")) {
 			abort("You don't seem to be playing Insult Beer Pong.");			
 		}
 
-		if (page.contains_text("Phooey"))
-		{
+		if (page.contains_text("Phooey")) {
 			print_minor_warning("Looks like something went wrong and you lost.");
 			return page;
 		}
 	
 		foreach i in insults
 		{
-			if (page.contains_text(insults[i].insult))
-			{
+			if (page.contains_text(insults[i].insult)) {
 				if (page.contains_text(insults[i].retort)) {
 					print_goal_complete("Found appropriate retort for insult.");
 					print_debug("Insult: " + insults[i].insult);
@@ -293,7 +289,7 @@ void PirateQuest()
 			set_backup_state();
 			outfit("swashbuckling getup");
 			print_goal("Meet the Cap' and initialize Beer Pong.");
-			while (available_amount($item[Cap'm Caronch's dentures]) > 0) {
+			while (have_item($item[Cap'm Caronch's dentures])) {
 				while_abort();
 				restore_hp(0);
 				restore_mp(0);

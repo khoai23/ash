@@ -32,19 +32,19 @@ void open_Basement () {
 	print_goal("Adventure in the basement.");
 	while(lastAdv!=4) {
 		while_abort();
-		adv1($location[The Castle in the Clouds in the Sky (Basement)],-1,"");
+		adv1($location[The Castle in the Clouds in the Sky (Basement)]);
 		lastAdv = checkBasementNoncombat();
 		if((have_item($item[amulet of extreme plot significance])) && (lastAdv==1)) {
 			set_choices(670,4);
 			equip($slot[acc3],$item[amulet of extreme plot significance]);
 			print_debug("Start using amulet.");
-			adv1($location[The Castle in the Clouds in the Sky (Basement)],-1,"");	
+			adv1($location[The Castle in the Clouds in the Sky (Basement)]);	
 			break;
 		} else if(have_item($item[titanium assault umbrella]) && (lastAdv==3)) {
 			set_choices(669,1);
 			equip($slot[weapon],$item[titanium assault umbrella]);
 			print_debug("Wield umbrella.");
-			adv1($location[The Castle in the Clouds in the Sky (Basement)],-1,"");	
+			adv1($location[The Castle in the Clouds in the Sky (Basement)]);	
 			break;
 		} else if(have_item($item[massive dumbbell])) {
 			print_debug("Have dumbbell, changing choice.");

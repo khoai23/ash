@@ -313,6 +313,16 @@ void maximize_for_ghost(){
 	}
 }
 
+void maximize_surgeon() {
+	if(have_item($item[surgical apron])) equip($item[surgical apron]);
+	if(get_recklessness()) {
+		if(have_item($item[bloodied surgical dungarees])) equip($item[bloodied surgical dungarees]);
+		if(have_item($item[surgical mask])) equip($slot[acc3],$item[surgical mask]);
+		if(have_item($item[head mirror])) equip($slot[acc2],$item[head mirror]);
+		if(have_item($item[half-size scalpel])) equip($slot[weapon],$item[half-size scalpel]);
+	}
+}
+
 // HYBRID FUNCTION
 
 void burn_mp() {
@@ -321,6 +331,10 @@ void burn_mp() {
 	if(my_mp()>trigger) {
 		cli_execute("burn " + (my_mp()-threshold) + " mp");
 	}
+}
+
+boolean adv1(location loc) {
+	return adv1(loc,-1,"");
 }
 
 // IN ADVENTURE FUNCTION
@@ -337,8 +351,9 @@ buffer manual_run_choice(int choiceNumber,int choice) {
 
 void obtain_outfit(string outfit, location loc) {
 	print_debug("@obtain_outfit outfit:"+outfit+"|loc:"+loc);
+	cli_execute("conditions clear");
 	while(!have_outfit(outfit) && !is_wearing_outfit(outfit)) {
-		adventure(1,loc,"");
+		adv1(loc);
 		while_abort();
 	}
 }
@@ -367,25 +382,28 @@ void custom_fight(string cond, string exec, boolean param) {
 
 void fulfill_condition(string cond, location loc) {
 	print_debug("@fulfill_condition condition:"+cond+"|loc:"+to_string(loc));
+	cli_execute("conditions clear");
 	while(!call boolean cond()) {
 		while_abort();
-		adv1(loc,-1,"");
+		adv1(loc);
 	}
 }
 
 void fulfill_condition(string cond, string add_exec, location loc) {
 	print_debug("@fulfill_condition_with_exec condition:"+cond+"|add_exec:"+add_exec+"|loc:"+to_string(loc));
+	cli_execute("conditions clear");
 	while(!call boolean cond()) {
 		while_abort();
-		adv1(loc,-1,"");
+		adv1(loc);
 		call add_exec();
 	}
 }
 
 void open_location(string parent_url, string loc, location place) {
 	print_debug("@open_location parentUrl:"+parent_url+"|fingerprint:"+loc+"|location:"+to_string(place));
+	cli_execute("conditions clear");
 	while(!contains_text(visit_url(parent_url),loc)) {
-		adventure(1,place);
+		adv1(place);
 		while_abort();
 	}
 }
@@ -393,7 +411,7 @@ void open_location(string parent_url, string loc, location place) {
 void open_location(string parent_url, string loc, string add_exec, location place) {
 	print_debug("@open_location_with_exec parentUrl:"+parent_url+"|fingerprint:"+loc+"|add_exec:"+add_exec+"|location:"+to_string(place));
 	while(!contains_text(visit_url(parent_url),loc)) {
-		adventure(1,place);
+		adv1(place);
 		call add_exec();
 		while_abort();
 	}
@@ -497,7 +515,7 @@ boolean run_function(string func_loc, string func) {
 void fulfill_condition(string cond_loc, string cond, location loc, int end) {
 	while(run_function(cond_loc,cond)) {
 		while_abort();
-		adv1(loc,-1,"");
+		adv1(loc);
 	}
 }
 

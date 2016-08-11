@@ -8,7 +8,6 @@ boolean side_frat = true;
 boolean side_hippy = false;
 
 boolean checkBeePollen() {
-	//set_transfer_value(!have_item($item[guy made of bee pollen]));
 	return have_item($item[guy made of bee pollen]);
 }
 
@@ -27,22 +26,21 @@ string beeKiller(boolean side) {
 	} else {
 		page = run_choice(page);
 	}
-	//checkBeePollen();
 	return page;
 }
 
 void runFlyerDefault(boolean side) {
 	if(get_property("sidequestArenaCompleted")=="fratboy" || get_property("sidequestArenaCompleted")=="hippy") {
-		vprint("Arena sidequest completed as " + get_property("sidequestArenaCompleted"),"green",1);
+		vprint("Arena sidequest completed as " + get_property("sidequestArenaCompleted"));
 		return;
 	}
 	string warOutfit = "Frat Warrior Fatigue";
 	if(side == side_hippy) {warOutfit = "War Hippy Fatigue"; outfit_c = 1; }
-	cli_execute("checkpoint");
-	print("Use outfit: " + warOutfit,"olive");
+	set_backup_state()
+	print_debug("Use outfit: " + warOutfit);
 	outfit(warOutfit);
 	visit_url("bigisland.php?place=concert");
-	cli_execute("outfit checkpoint");
+	get_backup_state()
 	
 	int guyMadeOfBeesCount = get_property("guyMadeOfBeesCount").to_int();
 	if(guyMadeOfBeesCount<4) {
@@ -53,96 +51,91 @@ void runFlyerDefault(boolean side) {
 	
 	if (!have_item($item[antique hand mirror]))	{
 		set_bedroom_choices();
-		obtain(1, "antique hand mirror", $location[the haunted bedroom]);
+		print_goal("Find antique hand mirror.");
+		obtain(1, $item[antique hand mirror], $location[The Haunted Bedroom]);
 	}
 	
 	set_choices(105,3);
+	print_goal("Flyer and kill the guy made of bees.");
 	custom_fight("checkBeePollen","beeKiller",side);
-	/*
-	while(!have_item($item[guy made of bee pollen])) {
-		restore_hp(0);
-		restore_mp(0);
-		beeKiller(outfit);
-		while_abort();
-	}	
-	*/
 	
 	outfit(warOutfit);
 	visit_url("bigisland.php?place=concert");
-	cli_execute("outfit checkpoint");
+	get_backup_state()
 }
 
 void dewormOrchard(boolean side) {
 	if(get_property("sidequestOrchardCompleted")=="fratboy" || get_property("sidequestOrchardCompleted")=="hippy") {
-		vprint("Orchard sidequest completed as "+get_property("sidequestOrchardCompleted"),"green",1);
+		print_quest_complete("Orchard sidequest completed as "+get_property("sidequestOrchardCompleted"));
 		return;
 	}
 	// save current outfit for adventuring
-	cli_execute("checkpoint");
+	set_backup_state()
 	// determine outfit by which is available
 	string war_outfit;
 	if(side==side_hippy) war_outfit = "War Hippy Fatigue";
 	else war_outfit = "Frat Warrior Fatigue";
-	vprint("Using outfit " + war_outfit,"olive",1);
+	print_debug("Using outfit " + war_outfit);
 	
 	// use outfit to receive quest
 	outfit(war_outfit);
 	visit_url("bigisland.php?place=orchard&action=stand&pwd");	
-	outfit("checkpoint");
+	get_backup_state()
 	
-	vprint("Searching for scent gland...","blue",1);
+	vprint("Searching for scent gland...");
 	while (have_effect($effect[Filthworm Guard Stench]) == 0) {
       while (have_effect($effect[Filthworm Drone Stench]) == 0) {
          while (have_effect($effect[Filthworm Larva Stench]) == 0) {
-            obtain(1, "filthworm hatchling scent gland", $location[the hatching chamber]);
+			print_goal("Acquire hatchling scent gland.");
+            obtain(1, $item[filthworm hatchling scent gland], $location[the hatching chamber]);
             while_abort();
-            if (!use(1, $item[filthworm hatchling scent gland])) vprint("You smell like a hatchling.","olive",4);
+            if (!use(1, $item[filthworm hatchling scent gland])) print_debug("You smell like a hatchling.");
          }
-		 vprint("Hatchling scent gland acquired.","blue",4);
-         obtain(1, "filthworm drone scent gland", $location[the feeding chamber]);
+		 print_goal("Acquire drone scent gland.");
+         obtain(1, $item[filthworm drone scent gland], $location[the feeding chamber]);
          while_abort();
-         if (!use(1, $item[filthworm drone scent gland])) vprint("You smell like a drone.","olive",4);
+         if (!use(1, $item[filthworm drone scent gland])) print_debug("You smell like a drone.");
       }
-	  vprint("Drone scent gland acquired.","blue",4);
-      obtain(1, "filthworm royal guard scent gland", $location[the royal guard chamber]);
+	  print_goal("Acquire guard scent gland.");
+      obtain(1, $item[filthworm royal guard scent gland], $location[the royal guard chamber]);
       while_abort();
-      if (!use(1, $item[filthworm royal guard scent gland])) vprint("You smell like a guard.","olive",4);
+      if (!use(1, $item[filthworm royal guard scent gland])) print_debug("You smell like a guard.");
    }
-   vprint("Guard scent gland acquired.","blue",4);
-   obtain(1, "heart of the filthworm queen", $location[the filthworm queen's chamber]);
-   vprint("Filthworm heart acquired.","blue",2);
+   print_goal("Guard scent gland acquired. Killing filthworm queen.");
+   obtain(1, $item[heart of the filthworm queen], $location[the filthworm queen's chamber]);
+   print_goal_complete("Filthworm heart acquired.");
    
    outfit(war_outfit);
    // finish quest
-   vprint("Deliver heart to owner...","blue",1);
+   print_goal("Deliver heart to owner...");
    visit_url("bigisland.php?place=orchard&action=stand&pwd");	
    // receive meat
    visit_url("bigisland.php?place=orchard&action=stand&pwd");
-   outfit("checkpoint");
+   get_backup_state()
 }
 
 void bombSearch(boolean side) {
 	if(get_property("sidequestLighthouseCompleted")=="fratboy" || get_property("sidequestLighthouseCompleted")=="hippy") {
-		vprint("Lighthouse sidequest completed as " + get_property("sidequestLighthouseCompleted"),"green",1);
+		print_quest_complete("Lighthouse sidequest completed as " + get_property("sidequestLighthouseCompleted"));
 		return;
 	}
 	string warOutfit = "Frat Warrior Fatigue";
 	if(side == side_hippy) warOutfit = "War Hippy Fatigue";
-	cli_execute("checkpoint");
+	set_backup_state()
 	outfit(warOutfit);
-	vprint("Use outfit: " + warOutfit,"olive",5);
-	vprint("Meet bombmaker...","blue",1);
+	print_debug("Use outfit: " + warOutfit);
+	print_goal("Meet bombmaker.");
 	visit_url("bigisland.php?place=lighthouse&action=pyro&pwd");
-	vprint("Searching for bomb barrels...","blue",1);
+	print_goal("Searching for bomb barrels.");
 	obtain(5, "barrel of gunpowder", $location[sonofa beach]);
-	vprint("Deliver payload...","blue",1);
+	print_goal("Deliver payload.");
     visit_url("bigisland.php?place=lighthouse&action=pyro&pwd");
-	cli_execute("outfit checkpoint");
+	get_backup_state()
 }
 
 boolean haveAllTools() {
 	return (have_item($item[molybdenum hammer]) && have_item($item[molybdenum crescent wrench]) &&
-						have_item($item[molybdenum pliers]) && have_item($item[molybdenum screwdriver]));
+			  have_item($item[molybdenum pliers]) && have_item($item[molybdenum screwdriver]));
 }
 
 string searchTools() {
@@ -227,29 +220,22 @@ string searchTools() {
 
 void findTools(boolean side) {
 	if(get_property("sidequestJunkyardCompleted")=="fratboy" || get_property("sidequestJunkyardCompleted")=="hippy") {
-		vprint("Junkyard sidequest completed as "+get_property("sidequestJunkyardCompleted"),"green",1);
+		print_quest_complete("Junkyard sidequest completed as "+get_property("sidequestJunkyardCompleted"));
 		return;
 	}
 	string warOutfit = "Frat Warrior Fatigue";
 	if(side == side_hippy) warOutfit = "War Hippy Fatigue";
-	cli_execute("checkpoint");
-	vprint("Use outfit: " + warOutfit,"olive",5);
+	set_backup_state()
+	print_debug("Use outfit: " + warOutfit);
 	outfit(warOutfit);
 	visit_url("bigisland.php?action=junkman&pwd");
-	cli_execute("outfit checkpoint");
+	get_backup_state()
 	
 	custom_fight("haveAllTools","searchTools");
-	/*while(!have_item($item[molybdenum hammer]) || !have_item($item[molybdenum crescent wrench]) ||
-		 !have_item($item[molybdenum pliers]) || !have_item($item[molybdenum screwdriver])) {
-		while_abort();
-		restore_hp(0);
-		restore_mp(0);
-		searchTools();
-	}*/
 	
 	outfit(warOutfit);
 	visit_url("bigisland.php?action=junkman&pwd");
-	cli_execute("outfit checkpoint");
+	get_backup_state()
 }
 
 boolean haveWarriorFratOutfit() {
@@ -266,53 +252,38 @@ boolean warStarted() {
 
 void StartWar() {
 	if(contains_text(visit_url("questlog.php?which=1"),"see if you can't stir up some trouble")) {
-		cli_execute("checkpoint");
+		set_backup_state()
 		if(!haveWarriorFratOutfit())
 			if(pulls_remaining()>=3 && user_confirm("Do you wish to pull outfit and bypass this part?")) {
 				if(!have_item($item[beer helmet])) take_storage(1,$item[beer helmet]);
 				if(!have_item($item[distressed denim pants])) take_storage(1,$item[distressed denim pants]);
 				if(!have_item($item[bejeweled pledge pin])) take_storage(1,$item[bejeweled pledge pin]);
 			} else {
-				vprint("Searching for entry outfit.","olive",5);
-				fulfill_condition("haveNormalHippyOutfit",$location[Hippy Camp]);
-				/*
-				while(!haveNormalHippyOutfit()) {
-					adventure(1,$location[Hippy Camp]);
-					while_abort();
-				}
-				*/
-				vprint("Searching for frat warrior outfit.","olive",5);
+				print_goal("Searching for entry outfit.");
+				obtain_outfit("Filthy Hippy Disguise",$location[Hippy Camp]);
+				//fulfill_condition("haveNormalHippyOutfit",$location[Hippy Camp]);
+				
+				print_goal("Searching for frat warrior outfit.");
 				outfit("Filthy Hippy Disguise");
-				fulfill_condition("haveWarriorFratOutfit",$location[Wartime Frat House (Hippy Disguise)]);
-				/*
-				while(!have_outfit("Frat Warrior Fatigues") && !is_wearing_outfit("Frat Warrior Fatigues")) {
-					adventure(1,$location[Wartime Frat House (Hippy Disguise)]);
-					while_abort();
-				}
-				*/
+				obtain_outfit("Frat Warrior Fatigues",$location[Wartime Frat House (Hippy Disguise)]);
+				//fulfill_condition("haveWarriorFratOutfit",$location[Wartime Frat House (Hippy Disguise)]);
 			}
 		outfit("Frat Warrior Fatigues");
 		set_choices(142,3);
 		set_choices(141,3);
-		vprint("Assassinating Franz Ferdinand.","olive",5);
+		print_goal("Assassinating Franz Ferdinand.");
 		fulfill_condition("warStarted",$location[Wartime Hippy Camp (Frat Disguise)]);
-		/*
-		while(!warStarted()) {
-			adventure(1,$location[Wartime Hippy Camp (Frat Disguise)]);
-			while_abort();
-		}
-		*/
-		vprint("Rollback to checkpoint outfit.","olive",5);
-		cli_execute("outfit checkpoint");
+		print_debug("Rollback to checkpoint outfit.");
+		get_backup_state()
 	} else {
-		vprint("War had started. By you. Congratulation, warmonger. Be proud of yourself.","green",1);
+		print_quest_complete("War had started. By you. Congratulation, warmonger. Be proud of yourself.");
 	}
 }
 
 void FightWar(boolean side) {
 	if(!contains_text(visit_url("island.php"),"Conspicuous Absence")) {
 		if(contains_text(visit_url("island.php"),"A Peaceful Meadow")) {
-			vprint("The war had ended. One (or both) side has been destroyed. Good work, you.","green",1);
+			print_quest_complete("The war had ended. One (or both) side has been destroyed. Good work, you.");
 			return;
 		} else {
 			abort("War have not been started.");
@@ -320,44 +291,44 @@ void FightWar(boolean side) {
  	}
 	council();
 	if(side == side_hippy) {
-		vprint("End war as a hippy.","olive",5);
+		print_goal("End war as a hippy.");
 		string warOutfit = "War Hippy Fatigue";
 		abort("This part is not automated.");
 	} else {
-		vprint("End war as a frat.","olive",5);
-		cli_execute("checkpoint");
-			vprint("Flyering.","olive",5);
+		print_goal("End war as a frat.");
+		set_backup_state()
+			print_debug("Flyering.");
 			runFlyerDefault(side);
-			vprint("Search for Yossarian's tools.","olive",5);
+			print_debug("Search for Yossarian's tools.");
 			findTools(side);
-			vprint("Search for bomb.","olive",5);
+			print_debug("Search for bomb.");
 			bombSearch(side);
 		string warOutfit = "Frat Warrior Fatigue";
-		vprint("Use outfit: " + warOutfit,"olive",5);
+		print_debug("Use outfit: " + warOutfit);
 		outfit(warOutfit);
 		while(get_property("hippiesDefeated").to_int()<64) {
 			while_abort();
 			adventure(1,$location[The Battlefield (Frat Uniform)]);
 		}
-		cli_execute("outfit checkpoint");
-			vprint("Killing the filthworm queen.","olive",5);
+		get_backup_state()
+			print_debug("Killing the filthworm queen.");
 			dewormOrchard(side);
 		outfit(warOutfit);
 		while(get_property("hippiesDefeated").to_int()<1000) {
 			while_abort();
 			adventure(1,$location[The Battlefield (Frat Uniform)]);
 		}
-		vprint("Finish the Big Whatever.","blue",1);
+		print_goal("Finish the Big Whatever.");
 		visit_url("bigisland.php?action=bossfight&pwd");
 		run_combat();
-		cli_execute("outfit checkpoint");
+		get_backup_state()
 	}
 	council();
 }
 
 void main() {
 	if(my_level() < 12){
-		vprint("What do you mean by war?","green",1); 
+		print_not_qualified("What do you mean by war?"); 
 	} else {
 		StartWar();
 		FightWar(side_frat);

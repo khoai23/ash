@@ -28,16 +28,16 @@ string hiddenTempleAdventure() {
 		return page;
 	} else if(contains_text(page,"Hidden Heart")) { // && have_item($item[The Nostril of The Serpent])
 		// beginning opening the way to the hidden city
-		// go to unconfusing button
+		print_debug("Go to unconfusing button.");
 		manual_run_choice(580,2);
-		// go to pikachulotal
+		print_debug("Go to pikachulotal.");
 		manual_run_choice(584,4);
-		// opening the way
+		print_debug("Open the way.");
 		manual_run_choice(580,1);
-		// choice raise hand
+		print_debug("Choice raise hand.");
 		manual_run_choice(123,2);
 		page = visit_url("choice.php");
-		// parsing the map and get your path
+		print_debug("Parse the map and get your path.");
 		int i = 0;
 		int count = 0;
 		string[63] mapping;
@@ -47,18 +47,18 @@ string hiddenTempleAdventure() {
 			mapping[count] = char_at(page,i);		
 		}
 		if(count!=63) abort("Parsing failed. Solve it yourself.");
-		vprint("Parsing completed. Begin navigating..","blue",1);
+		print_goal("Parsing completed. Begin navigating.");
 		for row from 0 upto 6 {
 			for column from 1 upto 9 {
 				if(mapping[(6-row)*9+column-1]==answer[row]){
-					vprint("Jump to tile " + column,"olive",5);
+					print_debug("Jump to tile " + column);
 					visit_url("tiles.php?action=jump&whichtile=" + column);
-					wait(1);
+					waitq(1);
 					break;
 				}
 			}
 		}
-		// do nothing to unlock
+		print_debug("Do nothing to unlock.");
 		page = manual_run_choice(125,3);
 	} else {
 		page = run_choice(page);
@@ -103,51 +103,30 @@ void helpWithBlackMarket() {
 
 void DiaryQuest()
 {
-	if (available_amount($item[your father's MacGuffin diary]) == 0)
-	{
-		if (!blackMarketOpened())
-		{
-			cli_execute("conditions clear");
+	if (!have_item($item[your father's MacGuffin diary])) {
+		if (!blackMarketOpened()) {
+			set_backup_state();
 			set_choices(923,1);
 			set_choices(1018,1);
 			set_choices(1019,1);
 
-			familiar family = my_familiar();
 			if(have_familiar($familiar[Reassembled Blackbird])){
 				use_familiar($familiar[Reassembled Blackbird]);
 			}
-			
+			print_goal("Search for black market.");
 			fulfill_condition("blackMarketOpened","helpWithBlackMarket",$location[The Black Forest]);
-			/*
-			while(!contains_text(visit_url("woods.php"),"blackmarket.gif")) {
-				if (!have_familiar($familiar[Reassembled Blackbird]))
-				{
-					if(have_item($item[sunken eyes]) && have_item($item[broken wings])) {
-						create(1,$item[reassembled blackbird]);
-						use(1,$item[reassembled blackbird]);
-						use_familiar($familiar[Reassembled Blackbird]);
-					}
-				}
-				checkForestChoice();
-				adventure(1,$location[The Black Forest]);
-				while_abort();
-			}
-			*/
-			
-			use_familiar(family);
+			get_backup_state();
 		} else {
-			vprint("Path to Black Market already opened.","green",1);
+			print_goal_complete("Path to Black Market already opened.");
 		}
 
-		if (contains_text(visit_url("shop.php?whichshop=blackmarket"),"forged identification documents"))
-		{
-			buy(1, $item[forged identification documents]);
+		if (contains_text(visit_url("shop.php?whichshop=blackmarket"),"forged identification documents")) {
+			if(!buy(1, $item[forged identification documents]))
+				abort("Cannot buy forged id doc.");
 		}
 
-		if (available_amount($item[forged identification documents]) > 0)
-		{
-			if(!have_item($item[your father's MacGuffin diary]))
-			{
+		if (have_item($item[forged identification documents])) {
+			if(!have_item($item[your father's MacGuffin diary])) {
 				if (my_adventures() < 3) {
 					abort("Ran out of adventures.");
 				}
@@ -158,21 +137,16 @@ void DiaryQuest()
 				} else {
 					set_choices(793,3);
 				}
-				adv1($location[The Shore\, Inc. Travel Agency],-1,"");
+				adv1($location[The Shore\, Inc. Travel Agency]);
 			}
 		}
 
-		if (available_amount($item[your father's MacGuffin diary]) > 0)
-		{
+		if (have_item($item[your father's MacGuffin diary])) {
 			visit_url("diary.php?textversion=1");
+		} else {
+			abort("Failed to retrieve your father's MacGuffin diary.");
 		}
-		else
-		{
-			abort("Failed to retrieve your father's MacGuffin diary");
-		}
-	}
-	else
-	{
+	} else {
 		visit_url("diary.php?textversion=1");
 	}
 }
@@ -188,21 +162,13 @@ void TempleQuest()
 	} 
 	if(!hiddenCityOpened()) {
 		if(!have_item($item[The Nostril of The Serpent]) && !user_confirm("Did you acquired the Nostril?")) {
-			vprint("Searching for the nostril of the serpent.","olive",5);
+			vprint("Searching for the nostril of the serpent.");
 			obtain(1,$item[The Nostril of The Serpent],$location[The Hidden Temple]);
 		} 
 		
 		custom_fight("hiddenCityOpened","hiddenTempleAdventure");
-		
-		/*boolean runTemple = false;
-		while(!runTemple) {
-			while_abort();
-			restore_hp(0);
-			restore_mp(0);
-			runTemple = hiddenTempleAdventure();
-		}*/
 	} else {
-		vprint("The path to the Hidden City are cleared.","green",1);
+		print_quest_complete("The path to the Hidden City are cleared.");
 	}
 }
 
@@ -211,126 +177,131 @@ void HiddenCityQuest()
 	if(contains_text(visit_url("questlog.php?which=1"),"Gotta Worship Them All")) {
 		if(!have_item($item[antique machete]) && !have_equipped($item[antique machete])) {
 			if(pulls_remaining()==0 || !user_confirm("Do you wish to pull the machete instead?")) {
-				vprint("Searching for machete","olive",5);
+				print_goal("Searching for machete");
 				set_choices(789,2);
 				obtain(1,$item[antique machete],$location[The Hidden Park]);
-			}
-			else {
+			} else {
 				take_storage(1,$item[antique machete]);
 			}
 		}
 		
-		item currentW = equipped_item($slot[weapon]);
-		item currentH = equipped_item($slot[off-hand]);
+		set_backup_state();
 		equip($slot[weapon],$item[antique machete]);
 		if(!contains_text(visit_url("place.php?whichplace=hiddencity"),"The Hidden Apartment Building")){
-			vprint("Unlocking Apartment..","blue",1);
+			print_goal("Unlocking Apartment..");
 			set_choices(781,1);
-			while(get_property("lastEncounter") != "Earthbound and Down") {
+			while(get_last_encounter() != "Earthbound and Down") {
 				while_abort();
-				adv1($location[An Overgrown Shrine (Northwest)],-1,"");
+				adv1($location[An Overgrown Shrine (Northwest)]);
 			}
 		}
 		if(!contains_text(visit_url("place.php?whichplace=hiddencity"),"The Hidden Office Building")){
-			vprint("Unlocking Office..","blue",1);
+			print_goal("Unlocking Office..");
 			set_choices(785,1);
-			while(get_property("lastEncounter") != "Air Apparent") {
+			while(get_last_encounter() != "Air Apparent") {
 				while_abort();
-				adv1($location[An Overgrown Shrine (Northeast)],-1,"");
+				adv1($location[An Overgrown Shrine (Northeast)]);
 			}
 		}
 		if(!contains_text(visit_url("place.php?whichplace=hiddencity"),"The Hidden Hospital")){
-			vprint("Unlocking Hospital..","blue",1);
+			print_goal("Unlocking Hospital..");
 			set_choices(783,1);
-			while(get_property("lastEncounter") != "Water You Dune") {
+			while(get_last_encounter() != "Water You Dune") {
 				while_abort();
-				adv1($location[An Overgrown Shrine (Southwest)],-1,"");
+				adv1($location[An Overgrown Shrine (Southwest)]);
 			}
 		}
 		if(!contains_text(visit_url("place.php?whichplace=hiddencity"),"The Hidden Bowling Alley")){
-			vprint("Unlocking Bowling Alley..","blue",1);
+			print_goal("Unlocking Bowling Alley..");
 			set_choices(787,1);
-			while(get_property("lastEncounter") != "Fire When Ready") {
+			while(get_last_encounter() != "Fire When Ready") {
 				while_abort();
-				adv1($location[An Overgrown Shrine (Southeast)],-1,"");
+				adv1($location[An Overgrown Shrine (Southeast)]);
 			}
 		}
-		equip($slot[weapon],currentW);
-		equip($slot[off-hand],currentH);
+		get_backup_state();
 		
 		if(!have_item($item[stone triangle])) {
-			vprint("Searching for all spheres","blue",1);
-			while(!have_item($item[moss-covered stone sphere])) {
-				vprint("Searching for moss sphere","olive",5);
-				if(have_effect($effect[Thrice-Cursed])>0) set_choices(780,1);
-				else set_choices(780,3);
-				while_abort();
-				adventure(1,$location[The Hidden Apartment Building]);
+			print_goal("Searching for all spheres");
+			if(!have_item($item[moss-covered stone sphere])) {
+				print_goal("Searching for moss sphere.");
+				while(!have_item($item[moss-covered stone sphere])) {
+					if(have_effect($effect[Thrice-Cursed])>0) set_choices(780,1);
+					else set_choices(780,3);
+					while_abort();
+					adventure(1,$location[The Hidden Apartment Building]);
+				} 
+			} else {
+				print_goal_complete("Had moss sphere already.");
 			}
 			
-			while(!have_item($item[crackling stone sphere])) {
-				vprint("Searching for crackling sphere","olive",5);
-				// KolMafia automatically use the binder clips.
-				if(have_item($item[McClusky file (complete)])) {
-					set_choices(786,1);
-				} 	else set_choices(786,2);
-				while_abort();
-				adventure(1,$location[The Hidden Office Building]);
+			if(!have_item($item[crackling stone sphere])) {
+				print_goal("Searching for crackling sphere.");
+				while(!have_item($item[crackling stone sphere])) {
+					// KolMafia automatically use the binder clips.
+					if(have_item($item[McClusky file (complete)])) set_choices(786,1);
+					else set_choices(786,2);
+					while_abort();
+					adventure(1,$location[The Hidden Office Building]);
+				}
+			} else {
+				print_goal_complete("Had crackling sphere already.");
 			}
 			
 			if(!have_item($item[scorched stone sphere])) {
-				vprint("Searching for scorched sphere","olive",5);
+				print_goal("Searching for scorched sphere.");
 				set_choices(788,1);
 				obtain(1,$item[scorched stone sphere],$location[The Hidden Bowling Alley]);
+			} else {
+				print_goal_complete("Had scorched sphere already.");
 			}
 			
 			set_choices(784,1);
 			if(!have_item($item[dripping stone sphere])) {
-				vprint("Searching for dripping sphere","olive",5);
-				cli_execute("checkpoint");
+				print_goal("Searching for dripping sphere.");
+				set_backup_state();
 				if(!have_item($item[surgical apron]) && pulls_remaining()>0) {
 					take_storage(1,$item[surgical apron]);
 				}
 				while(!have_item($item[dripping stone sphere])) {
-					if(have_item($item[surgical apron])) equip($item[surgical apron]);
-					if(have_item($item[bloodied surgical dungarees])) equip($item[bloodied surgical dungarees]);
-					if(have_item($item[surgical mask])) equip($slot[acc3],$item[surgical mask]);
-					if(have_item($item[head mirror])) equip($slot[acc2],$item[head mirror]);
-					if(have_item($item[half-size scalpel])) equip($slot[weapon],$item[half-size scalpel]);
+					maximize_surgeon();
 					while_abort();
 					adventure(1,$location[The Hidden Hospital]);
 				}
-				cli_execute("outfit checkpoint");
+				get_backup_state();
+			} else {
+				print_goal_complete("Had dripping sphere already.");
 			}
 		}
 		
 		if(have_item($item[moss-covered stone sphere]) && have_item($item[crackling stone sphere])
 		  && have_item($item[scorched stone sphere]) && have_item($item[dripping stone sphere])) {
-			vprint("Trading spheres for triangles..","blue",1);
-			adv1($location[An Overgrown Shrine (Northeast)],-1,"");
-			adv1($location[An Overgrown Shrine (Southeast)],-1,"");
-			adv1($location[An Overgrown Shrine (Northwest)],-1,"");
-			adv1($location[An Overgrown Shrine (Southwest)],-1,"");
-		} 
+			print_goal("Trading spheres for triangles..");
+			adv1($location[An Overgrown Shrine (Northeast)]);
+			adv1($location[An Overgrown Shrine (Southeast)]);
+			adv1($location[An Overgrown Shrine (Northwest)]);
+			adv1($location[An Overgrown Shrine (Southwest)]);
+		}
 		
 		if(item_amount($item[stone triangle])==4) {
+			set_backup_state();
 			equip($slot[weapon],$item[antique machete]);
 			set_choices(791,6);
-			while(get_property("lastEncounter")!="Legend of the Temple in the Hidden City") {
-				adv1($location[A Massive Ziggurat],-1,"");
+			while(get_last_encounter()!="Legend of the Temple in the Hidden City") {
+				adv1($location[A Massive Ziggurat]);
 				while_abort();
 			}
-			equip($slot[weapon],currentW);
-			equip($slot[off-hand],currentH);
 			set_choices(791,1);
-			vprint("Taking down the Protector Spectre.","blue",1);
-			adv1($location[A Massive Ziggurat],-1,"");
+			vprint("Taking down the Protector Spectre.");
+			get_backup_state();
+			while_abort();
+			adv1($location[A Massive Ziggurat]);
 		} else abort("You(probably) have messed up the plan. Clean after yourself.");
 		
 	} else if(contains_text(visit_url("questlog.php?which=2"),"Gotta Worship Them All")) {
-		vprint("You have already solve the Hidden City's mystery","green",1);
+		print_quest_complete("You have already solve the Hidden City's mystery");
 	} else {
-		vprint("The Hidden City quest is unavailable.","black",1);
+		print_not_qualified("The Hidden City quest is unavailable.");
 	}
 }
 
@@ -350,24 +321,15 @@ void LordSpookyravenQuest()
 
 	if (contains_text(visit_url("questlog.php?which=1"),"In a Manor of Spooking"))
 	{
-		cli_execute("conditions clear");
 		set_choices(921,1);
-        if (!cellarOpened())
-		{
-			vprint("Finding the hidden switch to the cellar","olive",5);
+        if (!cellarOpened()) {
+			print_goal("Finding the hidden switch to the cellar");
 			fulfill_condition("cellarOpened",$location[The Haunted Ballroom]);
-			/*
-			while (!contains_text(visit_url("place.php?whichplace=manor1"), "sr_floor1_stairsdown.gif"))
-			{
-				while_abort();
-                adventure(1, $location[The Haunted Ballroom]);
-			}
-			*/
 		}
 		
 		visit_url("place.php?whichplace=manor4&action=manor4_chamberwall");
-		if(have_item($item[recipe: mortar-dissolving solution]))
-			vprint("Seeing the hidden bomb-making recipe","olive",5);
+		if(have_item($item[recipe: mortar-dissolving solution])) {
+			print_goal("Seeing the hidden bomb-making recipe");
 			if(have_item($item[Lord Spookyraven's spectacles])) {
 				item subtitute = equipped_item($slot[acc3]);
 				equip($slot[acc3],$item[Lord Spookyraven's spectacles]);
@@ -376,32 +338,32 @@ void LordSpookyravenQuest()
 			} else {
 				use(1,$item[recipe: mortar-dissolving solution]);
 			}
+		}
 
-		if (contains_text(visit_url("questlog.php?which=1"),"blasting soda"))
-		{
-			vprint("Find Vinegar bottle","olive",5);
+		if (contains_text(visit_url("questlog.php?which=1"),"blasting soda")) {
+			print_goal("Find Vinegar bottle");
 			if(!have_item($item[bottle of Chateau de Vinegar])) {
 				obtain(1,$item[bottle of Chateau de Vinegar],$location[The Haunted Wine Cellar]);
 			}			
 			
-			vprint("Find blasting soda","olive",5);
+			print_goal("Find blasting soda");
 			if(!have_item($item[blasting soda])) {
 				obtain(1,$item[blasting soda],$location[The Haunted Laundry Room]);
 			}
 		} else if (!contains_text(visit_url("questlog.php?which=1"),"-or-") &&
 			contains_text(visit_url("questlog.php?which=1"),"loosening powder")){
-			abort("Screw YOUR scavenger hunt. Find that spectacles and try better thing.");
+			abort("Screw YOUR scavenger hunt. Find that spectacles.");
 		}
 		
 		if (contains_text(visit_url("questlog.php?which=1"),"Cook up the explosive mixture")) {
-			vprint("Cook the inert bomb","olive",5);
+			print_goal("Cook the inert bomb");
 			create(1,$item[unstable fulminate]);
 		}
 		
 		item currentW = equipped_item($slot[weapon]);
 		item currentH = equipped_item($slot[off-hand]);
 		if (contains_text(visit_url("questlog.php?which=1"),"Heat up the explosive mixture")) {
-			vprint("Heat the bomb up","olive",5);
+			print_goal("Heat the bomb up");
 			if(have_equipped($item[unstable fulminate]) || equip($item[unstable fulminate])) {
 				obtain(1,$item[wine bomb],$location[The Haunted Boiler Room]);
 			} else {
@@ -409,25 +371,21 @@ void LordSpookyravenQuest()
 			}
 		}
 		equip($slot[weapon],currentW);
-		equip(currentH);
+		equip($slot[off-hand],currentH);
 		
 		if(have_item($item[wine bomb])) {
-			vprint("Blow your way open!","olive",5);
+			print_goal("Blow your way open!");
 			visit_url("place.php?whichplace=manor4&action=manor4_chamberwall");
 		}
 		
 		if(contains_text(visit_url("questlog.php?which=1"),"confront Lord Spookyraven")) {
-			vprint("Smash the lord of this spooky manor","olive",5);
+			print_goal("Smash the lord of this spooky manor.");
 			adventure(1,$location[Summoning Chamber]);
 		}
-	}
-	else if (contains_text(visit_url("questlog.php?which=2"),"In a Manor of Spooking"))
-	{
-		vprint("You have already completed In a Manor of Spooking.","green",1);
-	}
-	else
-	{
-		vprint("In a Manor of Spooking is not currently available.","black",1);
+	} else if (contains_text(visit_url("questlog.php?which=2"),"In a Manor of Spooking")) {
+		print_quest_complete("You have already completed In a Manor of Spooking.");
+	} else {
+		print_not_qualified("In a Manor of Spooking is not currently available.");
 	}
 }
 
@@ -460,73 +418,49 @@ boolean belowdecksOpened() {
 
 void PalindomeQuest()
 {
-	if (contains_text(visit_url("questlog.php?which=1"),"Of Mice and Shen") || contains_text(visit_url("questlog.php?which=1"),"Never Odd Or Even"))
-	{
-		if (!have_item($item[Talisman o' Namsilat]) && (equipped_amount($item[Talisman o' Namsilat])==0))
-		{
-			cli_execute("checkpoint");
+	if (contains_text(visit_url("questlog.php?which=1"),"Of Mice and Shen") || contains_text(visit_url("questlog.php?which=1"),"Never Odd Or Even")) {
+		if (!have_item($item[Talisman o' Namsilat]) && (equipped_amount($item[Talisman o' Namsilat])==0)) {
+			set_backup_state();
 			PirateQuest();
-			if (available_amount($item[pirate fledges]) > 0)
-			{
+			if (available_amount($item[pirate fledges]) > 0) {
 				if(!equip($slot[acc3], $item[pirate fledges]))
 					abort("Failed equipping fledge. Check your state.");
 
-				vprint("Openning Belowdecks","olive",5);
+				print_goal("Open Belowdecks");
 				fulfill_condition("belowdecksOpened", $location[The Poop Deck]);
-				/*
-				while (!belowdecksOpened())
-				{
-					while_abort();
-					adventure(1, $location[The Poop Deck]);
-				}
-				*/
 
-				if (belowdecksOpened())
-				{
-					if (available_amount($item[snakehead charrrm]) < 2)
+				if (belowdecksOpened()) {
+					if (item_amount($item[snakehead charrrm]) < 2)
 					{
-						vprint("Searching for snakehead charrrm","olive",5);
-						obtain(2-available_amount($item[snakehead charrrm]), $item[snakehead charrrm], $location[Belowdecks]);
+						print_goal("Search for snakehead charrrm");
+						obtain(2-item_amount($item[snakehead charrrm]), $item[snakehead charrrm], $location[Belowdecks]);
 					}
 					// the item are made automatically by KolMafia.
 				}
 			}
-			cli_execute("outfit checkpoint");
+			get_backup_state();
 		}
 
-		cli_execute("checkpoint");
-		if (have_item($item[Talisman o' Namsilat]))
-		{
+		set_backup_state()
+		if (have_item($item[Talisman o' Namsilat])) {
 			equip($slot[acc3], $item[Talisman o' Namsilat]);
 		}
-		if (contains_text(visit_url("plains.php"),"palinlink.gif"))
-		{
+		if (contains_text(visit_url("plains.php"),"palinlink.gif")) {
 			set_choices(129,1);
 			if(!contains_text(visit_url("place.php?whichplace=palindome"),"Awkward")) {
-				vprint("Opening path to Dr. Awkward","blue",1);
+				print_goal("Open door to Dr. Awkward's office.");
 				custom_fight("haveVol1","takeDogPhoto");
-				/*
-				while(!have_item($item[I Love Me, Vol. I])) {
-					while_abort();
-					restore_hp(0);
-					restore_mp(0);
-					takeDogPhoto();
-				}
-				*/
 				use(1,$item[I Love Me, Vol. I]);
+			} else {
+				print_goal_complete("Door to Dr. Awkward opened.");
 			}
+			
 			if(!contains_text(visit_url("place.php?whichplace=palindome"),"Alarm")) {
-				vprint("Opening path to Dr. Alarm","blue",1);
+				print_goal("Search for photo to meet Dr. Awkward.");
 				custom_fight("haveAllPhoto","takeDogPhoto");
-				/*while(!have_item($item[photograph of a dog]) || !have_item($item[photograph of God]) 
-				  || !have_item($item[photograph of a red nugget]) || !have_item($item[photograph of an ostrich egg])) {
-					while_abort();
-					restore_hp(0);
-					restore_mp(0);
-					takeDogPhoto();
-				}*/
 				
 				if(!have_item($item[2 Love Me, Vol. 2])) {
+					print_goal("Putting photo to place.");
 					visit_url("place.php?whichplace=palindome&action=pal_droffice");
 					visit_url("choice.php?pwd&whichchoice=872&option=1&photo1=2259&photo2=7264&photo3=7263&photo4=7265");
 					if(have_item($item[Clan VIP Lounge key]) && user_confirm("Use the hottub to recuperate?"))
@@ -534,43 +468,46 @@ void PalindomeQuest()
 					else if(user_confirm("Rest at campsite?")) 
 						visit_url("campground.php?action=rest");
 					else 
-						abort("Please heal up and continue.");
+						res_abort("Please heal up and continue.");
 				}
 				use(1,$item[2 Love Me, Vol. 2]);
+			} else {
+				print_goal_complete("You now can meet Dr. Alarm.");
 			}
 			visit_url("place.php?whichplace=palindome&action=pal_mroffice");
 			
 			set_choices(131,1);
 			if(contains_text(visit_url("questlog.php?which=1"),"wet stunt nut stew")) {
-				vprint("Searching for wet stunt nut stew","blue",1);
-				obtain(1, $item[wet stunt nut stew], $location[Inside the Palindome]);
+				if(pulls_remaining()>0 && storage_amount($item[wet stunt nut stew])>0 &&
+					user_confirm("Pulling the wet stunt nut stew and bypass this part?")) {
+					print_goal("Pull wet stunt nut stew");
+					take_storage(1,$item[wet stunt nut stew]);
+				} else {
+					print_goal("Search for wet stunt nut stew");
+					obtain(1, $item[wet stunt nut stew], $location[Inside the Palindome]);
+				}
 				visit_url("place.php?whichplace=palindome&action=pal_mroffice");
 			}
 			
 			if(have_item($item[Mega Gem])) {
-				vprint("Avenging yourself!","blue",1);
+				print_goal("Avenging yourself!");
 				equip($slot[acc2],$item[Mega Gem]);
 				string page = visit_url("place.php?whichplace=palindome&action=pal_droffice");
 				page=run_choice(page);
 				page=run_combat();
 			}
 		}
-		cli_execute("outfit checkpoint");
-	}
-	else if (contains_text(visit_url("questlog.php?which=2"),"Never Odd Or Even"))
-	{
-		vprint("You have already completed Never Odd Or Even.","green",1);
-	}
-	else
-	{
-		vprint("Never Odd Or Even is not currently available.","black",1);
+		get_backup_state()
+	} else if (contains_text(visit_url("questlog.php?which=2"),"Never Odd Or Even")) {
+		print_quest_complete("You have already completed Never Odd Or Even.");
+	} else {
+		print_not_qualified("Never Odd Or Even is not currently available.");
 	}
 }
 
 void DesertQuest()
 {
-    if (contains_text(visit_url("questlog.php?which=1"),"Just Deserts"))
-	{
+    if (contains_text(visit_url("questlog.php?which=1"),"Just Deserts")) {
 		cli_execute("conditions clear");
 
 		if (!have_item($item[UV-resistant compass]) && (equipped_amount($item[UV-resistant compass])==0)) {
@@ -586,23 +523,22 @@ void DesertQuest()
 					} else {
 						set_choices(793,3);
 					}
-					adv1($location[The Shore\, Inc. Travel Agency],-1,"");
+					adv1($location[The Shore\, Inc. Travel Agency]);
 				}
 				//buy(1,$item[UV-resistant compass]);
 				cli_execute("/buy UV-resistant compass");
 			}
 		}
 		
-		cli_execute("checkpoint");
+		set_backup_state();
 		if(have_item($item[UV-resistant compass])) equip($item[UV-resistant compass]);
 		
 		if(!contains_text(visit_url("beach.php"),"oasis.gif")) {
 			while_abort();
-			adventure(1, $location[The Arid\, Extra-Dry Desert]);
+			adv1($location[The Arid\, Extra-Dry Desert]);
 		}
 
-		if(!contains_text(visit_url("beach.php"),"gnasir.gif"))
-		{
+		if(!contains_text(visit_url("beach.php"),"gnasir.gif")) {
 			set_choices(805,1);
 			while_abort();
 			adventure(have_effect($effect[Ultrahydrated]), $location[The Arid\, Extra-Dry Desert]);
@@ -621,8 +557,8 @@ void DesertQuest()
 		int gnasirProgress = get_property("gnasirProgress").to_int();
 		while(get_property("desertExploration").to_int()<100) {
 			while_abort();
-			if(have_effect($effect[Ultrahydrated])==0) adventure(1,$location[The Oasis]);
-			else adventure(1,$location[The Arid\, Extra-Dry Desert]);
+			if(have_effect($effect[Ultrahydrated])==0) adv1($location[The Oasis]);
+			else adv1($location[The Arid\, Extra-Dry Desert]);
 			gnasirProgress = get_property("gnasirProgress").to_int();
 			if((gnasirProgress & 1) == 0 && have_item($item[stone rose])) {
 				visit_url("place.php?whichplace=desertbeach&action=db_gnasir");
@@ -651,31 +587,24 @@ void DesertQuest()
 					if(user_confirm("Do you want to pull drum machine?")) {
 						take_storage(1,$item[drum machine]);
 					} else {
-						vprint("Farming for drum machine..","olive",5);
-						cli_execute("conditions clear");
-						add_item_condition(1,$item[drum machine]);
-						adventure(my_adventures(),$location[The Oasis]);
+						print_goal("Farming for drum machine..");
+						obtain(1,$item[drum machine],$location[The Oasis]);
 					}
 				}
 				use(1,$item[drum machine]);
 			}
 		}
-		cli_execute("outfit checkpoint");
-	}
-	else if (contains_text(visit_url("beach.php"),"pyramid.gif"))
-	{
-		vprint("You have already found the path to the pyramid.","green",1);
-	}
-	else
-	{
-		vprint("Desert path is not currently available.","black",1);
+		get_backup_state()
+	} else if (contains_text(visit_url("beach.php"),"pyramid.gif")) {
+		print_quest_complete("You have already found the path to the pyramid.");
+	} else {
+		print_not_qualified("Desert path is not currently available.");
 	}
 }
 
 void PyramidQuest()
 {
-	if (contains_text(visit_url("questlog.php?which=1"),"A Pyramid Scheme"))
-	{
+	if (contains_text(visit_url("questlog.php?which=1"),"A Pyramid Scheme")) {
 		if (!contains_text(visit_url("beach.php"),"pyramid.gif")) {
 			abort("The Small Pyramid is not currently available.");
 		}
@@ -684,28 +613,19 @@ void PyramidQuest()
 			if(!have_item($item[Staff of Ed])) {
 				cli_execute("/paste Staff of Ed");
 			}
-
 			visit_url("place.php?whichplace=desertbeach&action=db_pyramid1");
 		}
 		
-		vprint("Opening path to middle chamber","olive",5);
+		print_goal("Opening path to middle chamber");
 		open_location("place.php?whichplace=pyramid","pyramid_middle.gif",$location[The Upper Chamber]);
-		/*while(!contains_text(visit_url("place.php?whichplace=pyramid"),"pyramid_middle.gif")) {
-			while_abort();
-			adventure(1,$location[The Upper Chamber]);
-		}*/
 		
 		// rat olfacting handled by WHAM
 		if(!contains_text(visit_url("place.php?whichplace=pyramid"),"pyramid_bottom1a.gif")) {
-			vprint("Opening control room","olive",5);
+			print_goal("Opening control room");
 			open_location("place.php?whichplace=pyramid","pyramid_controlroom.gif",$location[The Middle Chamber]);
-			/*while(!contains_text(visit_url("place.php?whichplace=pyramid"),"pyramid_controlroom.gif")) {
-				while_abort();
-				adventure(1,$location[The Middle Chamber]);
-			}*/
-			vprint("Get 10 wheel-turning device","olive",5);
+			print_goal("Get 10 wheel-turning device");
 			if(item_amount($item[crumbling wooden wheel])+item_amount($item[tomb ratchet])<10) {
-				obtain(10-item_amount($item[crumbling wooden wheel])-item_amount($item[tomb ratchet]),$item[tomb ratchet],$location[The Middle Chamber]);
+				obtain(10-item_amount($item[tomb ratchet]),$item[tomb ratchet],$location[The Middle Chamber]);
 			}
 			
 			if(!have_item($item[ancient bomb])) {
@@ -734,44 +654,32 @@ void PyramidQuest()
 		}
 		
 		council();
-	}
-	else if (contains_text(visit_url("questlog.php?which=2"),"A Pyramid Scheme"))
-	{
-		vprint("You have already completed A Pyramid Scheme.","green",1);
-	}
-	else
-	{
-		vprint("A Pyramid Scheme is not currently available.","black",1);
+	} else if (contains_text(visit_url("questlog.php?which=2"),"A Pyramid Scheme")) {
+		print_goal_complete("You have already completed A Pyramid Scheme.");
+	} else {
+		print_not_qualified("A Pyramid Scheme is not currently available.");
 	}
 }
 
 void MacGuffinQuest()
 {
-    if (my_level() >= 11)
-	{
+    if (my_level() >= 11) {
         council();
 
-		if (contains_text(visit_url("questlog.php?which=1"),"and the Quest for the Holy MacGuffin"))
-		{
+		if (contains_text(visit_url("questlog.php?which=1"),"and the Quest for the Holy MacGuffin")) {
 			DiaryQuest();
 			LordSpookyravenQuest();
 			WorshipQuest();
 			PalindomeQuest();
 			DesertQuest();
             PyramidQuest();
+		} else if (contains_text(visit_url("questlog.php?which=2"),"and the Quest for the Holy MacGuffin")) {
+			print_quest_complete("You have already completed the level 11 quest.");
+		} else {
+			print_warning("The level 11 quest is not currently available.");
 		}
-		else if (contains_text(visit_url("questlog.php?which=2"),"and the Quest for the Holy MacGuffin"))
-		{
-			vprint("You have already completed the level 11 quest.","green",1);
-		}
-		else
-		{
-			vprint("The level 11 quest is not currently available.","red",1);
-		}
-	}
-	else
-	{
-		vprint("You must be at least level 11 to attempt this quest.","black",1);
+	} else {
+		print_not_qualified("You must be at least level 11 to attempt this quest.");
 	}
 }
 
