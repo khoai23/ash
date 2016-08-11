@@ -417,10 +417,6 @@ void open_location(string parent_url, string loc, string add_exec, location plac
 	}
 }
 
-boolean test() {
-	return my_adventures() > 43;
-}
-
 // DAILY FUNCTION
 
 void use_still() {
@@ -479,9 +475,17 @@ boolean acquire_token() {
 	}
 }
 
+void test() {
+	matcher mtc = create_matcher("\\w+\\.gif",visit_url("main.php"));
+	while(find(mtc)) {
+		print(group(mtc));
+	}
+}
+
 void main()
 {
-	vprint("Used for testing new function and config.","blue",1);
+	print("Used for testing new function and config.","blue");
+	//test();
 	boolean choice = user_confirm("Do you wish to be reckless and (maybe) get your ass beaten?");
 	vprint("Recklessness: " + choice,"blue",1);
 	set_recklessness(choice);
