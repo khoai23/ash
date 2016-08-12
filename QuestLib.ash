@@ -392,17 +392,16 @@ void use_still() {
 		print_minor_warning("You don't have access to the still.");
 		return;
 	}
-	string page = visit_url("shop.php?whichshop=still");
-	if(contains_text(page,"The still is all tapped out for the day.")) {
+	
+	if(stills_available()==0) {
 		print_minor_warning("Out of converting juice. Return tomorrow.");
 		return;
 	}
-	int pos = index_of(page,"bright green lights on it.")-3;
-	int convert_remaining = to_int(substring(page,pos,pos+3));
-	if(item_amount($item[soda water])<convert_remaining) {
-		buy(convert_remaining-item_amount($item[soda water]),$item[soda water]);
-		visit_url("shop.php?whichshop=still&action=buyitem&quantity="+convert_remaining+"&whichrow=279&pwd");
+	if(item_amount($item[soda water])<stills_available()) {
+		buy(stills_available()-item_amount($item[soda water]),$item[soda water]);
+		//visit_url("shop.php?whichshop=still&action=buyitem&quantity="+stills_available()+"&whichrow=279&pwd");
 	}
+	create(stills_available(),$item[tonic water]);
 }
 
 boolean acquire_token() {
@@ -457,7 +456,7 @@ void main()
 	boolean choice = user_confirm("Do you wish to be reckless and (maybe) get your ass beaten?");
 	vprint("Recklessness: " + choice,"blue",1);
 	set_recklessness(choice);
-	//run_pvp();
+	run_pvp();
 	acquire_token();
 	use_still();
 }

@@ -25,10 +25,10 @@ void tileSolver(string input) {
 	string row;
 	while(find(tileMap)) {
 		if(count%9==0) row = "";
-		count++;
+		count+=1;
 		row += group(tileMap).char_at(4) + " ";
 		if(count%9==0) print(row);
-		if(count>63) abort("Failed parsing.")
+		if(count>63) abort("Failed parsing.");
 	}
 }
 
@@ -176,7 +176,7 @@ void TempleQuest()
 	} 
 	if(!hiddenCityOpened()) {
 		if(!have_item($item[The Nostril of The Serpent]) && !user_confirm("Did you acquired the Nostril?")) {
-			vprint("Searching for the nostril of the serpent.");
+			print_goal("Searching for the nostril of the serpent.");
 			obtain(1,$item[The Nostril of The Serpent],$location[The Hidden Temple]);
 		} 
 		
@@ -306,7 +306,7 @@ void HiddenCityQuest()
 				while_abort();
 			}
 			set_choices(791,1);
-			vprint("Taking down the Protector Spectre.");
+			print_goal("Taking down the Protector Spectre.");
 			get_backup_state();
 			while_abort();
 			adv1($location[A Massive Ziggurat]);
@@ -455,7 +455,7 @@ void PalindomeQuest()
 			get_backup_state();
 		}
 
-		set_backup_state()
+		set_backup_state();
 		if (have_item($item[Talisman o' Namsilat])) {
 			equip($slot[acc3], $item[Talisman o' Namsilat]);
 		}
@@ -511,7 +511,7 @@ void PalindomeQuest()
 				page=run_combat();
 			}
 		}
-		get_backup_state()
+		get_backup_state();
 	} else if (contains_text(visit_url("questlog.php?which=2"),"Never Odd Or Even")) {
 		print_quest_complete("You have already completed Never Odd Or Even.");
 	} else {
@@ -608,7 +608,7 @@ void DesertQuest()
 				use(1,$item[drum machine]);
 			}
 		}
-		get_backup_state()
+		get_backup_state();
 	} else if (contains_text(visit_url("beach.php"),"pyramid.gif")) {
 		print_quest_complete("You have already found the path to the pyramid.");
 	} else {
