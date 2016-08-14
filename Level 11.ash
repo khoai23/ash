@@ -427,19 +427,19 @@ void PalindomeQuest()
 			set_backup_state();
 			PirateQuest();
 			if (available_amount($item[pirate fledges]) > 0) {
-				if(!equip($slot[acc3], $item[pirate fledges]))
-					abort("Failed equipping fledge. Check your state.");
+				if(have_item($item[pirate fledges]))
+					equip($slot[acc3], $item[pirate fledges]);
 
 				print_goal("Open Belowdecks");
 				fulfill_condition("belowdecksOpened", $location[The Poop Deck]);
 
 				if (belowdecksOpened()) {
-					if (item_amount($item[snakehead charrrm]) < 2)
+					if (!have_item($item[Talisman o' Namsilat]))
 					{
 						print_goal("Search for snakehead charrrm");
-						obtain_item(2-item_amount($item[snakehead charrrm]), $item[snakehead charrrm], $location[Belowdecks]);
+						print_debug("The item are made automatically by KolMafia.");
+						obtain_item(1, $item[Talisman o' Namsilat], $location[Belowdecks]);
 					}
-					// the item are made automatically by KolMafia.
 				}
 			}
 			get_backup_state();
@@ -587,13 +587,11 @@ void DesertQuest()
 				visit_url("choice.php?pwd&whichchoice=805&option=2");
 				visit_url("choice.php?pwd&whichchoice=805&option=1");
 				if(!have_item($item[worm-riding hooks])) abort("Trading for hook failed.");
-				if(!have_item($item[drum machine]) && pulls_remaining()>0) {
-					if(user_confirm("Do you want to pull drum machine?")) {
-						take_storage(1,$item[drum machine]);
-					} else {
-						print_goal("Farming for drum machine..");
-						obtain_item(1,$item[drum machine],$location[The Oasis]);
-					}
+				if(!have_item($item[drum machine]) && pulls_remaining()>0 && user_confirm("Do you want to pull drum machine?")) {
+					take_storage(1,$item[drum machine]);
+				} else {
+					print_goal("Farming for drum machine..");
+					obtain_item(1,$item[drum machine],$location[The Oasis]);
 				}
 				use(1,$item[drum machine]);
 			}

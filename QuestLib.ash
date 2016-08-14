@@ -40,6 +40,16 @@ void print_not_qualified(string message) {
 	vprint("Fail:" + message,"maroon",main_quest_info);
 }
 
+// IN ADVENTURE FUNCTION
+
+buffer use_macro(string id) {
+	return visit_url("fight.php?action=macro&whichmacro="+id);
+}
+
+buffer manual_run_choice(int choiceNumber,int choice) {
+	return visit_url("choice.php?pwd&whichchoice="+choiceNumber+"&option="+choice);
+}
+
 // GET/SET/CHECK FUNCTION
 
 string get_last_encounter() {
@@ -149,6 +159,12 @@ string run_choice( string page_text ) {
 		if(to_int(choice_adv_num)>=890 && to_int(choice_adv_num)<=903) {
 			print_debug("Ignore the Light Out Quest.");
 			choice_num = "1";
+		}
+		if(to_int(choice_adv_num)==189) {
+			print_debug("Automate the El Vibrato Sphere.");
+			manual_run_choice(189,1);
+			page_text = visit_url("ocean.php?lon=59&lat=10");
+			return page_text;
 		}
 		
 		if( choice_num == "" ) abort( "Unsupported Choice Adventure!" );
@@ -305,12 +321,14 @@ void maximize_for_ghost(){
 }
 
 void maximize_surgeon() {
-	if(have_item($item[surgical apron])) equip($item[surgical apron]);
-	if(get_recklessness()) {
+	if(get_recklessness() || (equipped_amount($item[surgical apron]) + equipped_amount($item[bloodied surgical dungarees])
+		+ equipped_amount($item[surgical mask]) + equipped_amount($item[head mirror]) + equipped_amount($item[half-size scalpel]) == 0)) {
+		if(have_item($item[surgical apron])) equip($item[surgical apron]);
 		if(have_item($item[bloodied surgical dungarees])) equip($item[bloodied surgical dungarees]);
 		if(have_item($item[surgical mask])) equip($slot[acc3],$item[surgical mask]);
 		if(have_item($item[head mirror])) equip($slot[acc2],$item[head mirror]);
-		if(have_item($item[half-size scalpel])) equip($slot[weapon],$item[half-size scalpel]);
+		if(get_recklessness())
+			if(have_item($item[half-size scalpel])) equip($slot[weapon],$item[half-size scalpel]);
 	}
 }
 
@@ -326,16 +344,6 @@ void burn_mp() {
 
 boolean adv1(location loc) {
 	return adv1(loc,-1,"");
-}
-
-// IN ADVENTURE FUNCTION
-
-buffer use_macro(string id) {
-	return visit_url("fight.php?action=macro&whichmacro="+id);
-}
-
-buffer manual_run_choice(int choiceNumber,int choice) {
-	return visit_url("choice.php?pwd&whichchoice="+choiceNumber+"&option="+choice);
 }
 
 // AUTOMATON FUNCTION
