@@ -57,19 +57,19 @@ void FriarsQuest()
 		if (contains_text(visit_url("questlog.php?which=1"),"Trial By Friar")) {
 			if (!have_item($item[Eldritch Butterknife])) {
 				print_goal("Search for butterknife.");
-				obtain(1, $item[Eldritch Butterknife], $location[The Dark Elbow of the Woods]);
+				obtain_item(1, $item[Eldritch Butterknife], $location[The Dark Elbow of the Woods]);
 			} else {
 				print_goal_complete("Already have butterknife.");
 			}
 			if (!have_item($item[box of birthday candles]))	{
 				print_goal("Search for box of birthday candles.");
-				obtain(1, $item[box of birthday candles], $location[The Dark Heart of the Woods]);
+				obtain_item(1, $item[box of birthday candles], $location[The Dark Heart of the Woods]);
 			} else {
 				print_goal_complete("Already have box of birthday candles.");
 			}
 			if (!have_item($item[Dodecagram])) {
 				print_goal("Search for dodecagram.");
-				obtain(1, $item[Dodecagram], $location[The Dark Neck of the Woods]);
+				obtain_item(1, $item[Dodecagram], $location[The Dark Neck of the Woods]);
 			} else {
 				print_goal_complete("Already have dodecagram.");
 			}
@@ -102,7 +102,7 @@ void SteelQuest()
 				if (!have_item($item[Azazel's lollipop])) {
 					if(!have_item($item[observational glasses])) {
 						print_goal("Searching for appropriate tools.");
-						obtain(1, $item[observational glasses], $location[The Laugh Floor]);
+						obtain_item(1, $item[observational glasses], $location[The Laugh Floor]);
 					} else {
 						print_goal_complete("Already have all the tools.");
 					}
@@ -151,10 +151,10 @@ void SteelQuest()
 					cli_execute("conditions clear");
 					print_goal("Searching for items.");
 					if(available_amount($item[imp air]) < 5) {
-						obtain(5, $item[imp air], $location[The Laugh Floor]);
+						obtain_item(5, $item[imp air], $location[The Laugh Floor]);
 					}
 					if(available_amount($item[bus pass]) < 5) {
-						obtain(5, $item[bus pass], $location[Infernal Rackets Backstage]);
+						obtain_item(5, $item[bus pass], $location[Infernal Rackets Backstage]);
 					}
 					print_goal("Giving items to strangers.");
 					visit_url("pandamonium.php?action=moan");

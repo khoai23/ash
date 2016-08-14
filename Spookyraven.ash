@@ -1,5 +1,4 @@
 import <QuestLib.ash>;
-import <zlib.ash>;
 
 boolean haveLibraryKey() {
 	return have_item($item[Spookyraven library key]);
@@ -29,7 +28,7 @@ void UnlockSpookyraven()
 	
 	if(!have_item($item[Spookyraven billiards room key])) {
 		print_goal("Searching for billiards key.");
-		obtain(1, $item[Spookyraven billiards room key], $location[The Haunted Kitchen]);
+		obtain_item(1, $item[Spookyraven billiards room key], $location[The Haunted Kitchen]);
 	}
 
 	if (!haveLibraryKey())	{
@@ -49,7 +48,7 @@ void UnlockSpookyraven()
 
 	if(!have_item($item[Lady Spookyraven's necklace])) {
 		print_goal("Searching for necklace.");
-		obtain(1,$item[Lady Spookyraven's necklace],$location[The Haunted Library]);
+		obtain_item(1,$item[Lady Spookyraven's necklace],$location[The Haunted Library]);
 	}
 	
 	print_goal("Giving the ghost her necklace");

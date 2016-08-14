@@ -114,6 +114,11 @@ void run_pvp() {
 	if(contains_text(visit_url("campground.php"),"hippystone.gif")) {
 		visit_url("campground.php?pwd&smashstone=Yep.&confirm");
 	}
+	
+	if(pvp_attacks_left()>0)
+		cli_execute("pvp " + pvp_attacks_left() + " fame 0");
+	else	
+		print_minor_warning("No pvp fight left.");
 }
 
 int max_mcd() {
@@ -140,6 +145,11 @@ string run_choice( string page_text ) {
 		
 		string choice_adv_prop = "choiceAdventure" + choice_adv_num;
 		string choice_num = get_property( choice_adv_prop );
+		
+		if(to_int(choice_adv_num)>=890 && to_int(choice_adv_num)<=903) {
+			print_debug("Ignore the Light Out Quest.");
+			choice_num = "1";
+		}
 		
 		if( choice_num == "" ) abort( "Unsupported Choice Adventure!" );
 		
@@ -317,6 +327,20 @@ buffer manual_run_choice(int choiceNumber,int choice) {
 
 // AUTOMATON FUNCTION
 
+void obtain_item(int num, item it, location loc) {
+	obtain(num,it,loc);
+	if(item_amount(it)<num) {
+		res_abort("Obtain failed, executing rollback.");
+	}
+}
+
+void obtain_item(int num, string it, location loc) {
+	obtain(num,it,loc);
+	if(item_amount(to_item(it))<num) {
+		res_abort("Obtain failed, executing rollback.");
+	}
+}
+
 void obtain_outfit(string outfit, location loc) {
 	print_debug("@obtain_outfit outfit:"+outfit+"|loc:"+loc);
 	cli_execute("conditions clear");
@@ -386,6 +410,15 @@ void open_location(string parent_url, string loc, string add_exec, location plac
 }
 
 // DAILY FUNCTION
+int still_list = 5;
+item[int] still_ingr;
+item[int] still_res;
+still_ingr[1] = $item[bottle of rum]; still_res[1] = $item[bottle of Lieutenant Freeman];
+still_ingr[2] = $item[olive]; still_res[2] = $item[cocktail onion];
+still_ingr[3] = $item[bottle of gin]; still_res[3] = $item[bottle of Calcutta Emerald];
+still_ingr[4] = $item[lemon]; still_res[4] = $item[kiwi];
+still_ingr[5] = $item[orange]; still_res[5] = $item[kumquat];
+still_ingr[6] = $item[soda water]; still_res[6] = $item[tonic water];
 
 void use_still() {
 	if(my_primestat()!=$stat[moxie]) {
@@ -397,11 +430,19 @@ void use_still() {
 		print_minor_warning("Out of converting juice. Return tomorrow.");
 		return;
 	}
-	if(item_amount($item[soda water])<stills_available()) {
-		buy(stills_available()-item_amount($item[soda water]),$item[soda water]);
-		//visit_url("shop.php?whichshop=still&action=buyitem&quantity="+stills_available()+"&whichrow=279&pwd");
+	for i from 1 upto still_list {
+		if(stills_available()==0) return;
+		if(have_item(still_ingr[i])) {
+			create(min(stills_available(),item_amount(still_ingr[i])),still_res[i]);
+		}
+	} 
+	if(stills_available()>0) {
+		if(item_amount($item[soda water])<stills_available()) {
+			buy(stills_available()-item_amount($item[soda water]),$item[soda water]);
+			//visit_url("shop.php?whichshop=still&action=buyitem&quantity="+stills_available()+"&whichrow=279&pwd");
+		}
+		create(stills_available(),$item[tonic water]);
 	}
-	create(stills_available(),$item[tonic water]);
 }
 
 boolean acquire_token() {
@@ -459,43 +500,4 @@ void main()
 	run_pvp();
 	acquire_token();
 	use_still();
-}
-
-// DEPRECATED
-
-void set_transfer_value(boolean value) {
-	set_property("script_transfer",to_string(value));
-}
-
-boolean get_transfer_value() {
-	string value = get_property("script_transfer");
-	if(value=="") value = "false";
-	return to_boolean(value);
-}
-
-void run_function(string func_loc, string func, string param) {
-	cli_execute("ashq import <"+func_loc+".ash> "+func+"(+param+)");
-}
-
-boolean run_function(string func_loc, string func) {
-	cli_execute("ashq import <"+func_loc+".ash> "+func+"()");
-	return get_transfer_value();
-}
-
-
-void fulfill_condition(string cond_loc, string cond, location loc, int end) {
-	while(run_function(cond_loc,cond)) {
-		while_abort();
-		adv1(loc);
-	}
-}
-
-void custom_fight(string script_loc, string exec,string param) {
-	while(get_transfer_value()) {
-		while_abort();
-		restore_hp(0);
-		restore_mp(0);
-		burn_mp();
-		run_function(script_loc,exec,param);
-	}
 }

@@ -87,7 +87,7 @@ void LOLQuest()
 					}
 					if(contains_text(visit_url("questlog.php?which=1"),"Driven Crazy")) {
 						print_goal("Search for screwdriver.");
-						if(!knoll_available()) obtain(1,$item[rusty screwdriver],$location[The Degrassi Knoll Garage]);
+						if(!knoll_available()) obtain_item(1,$item[rusty screwdriver],$location[The Degrassi Knoll Garage]);
 						else visit_url("place.php?whichplace=knoll_friendly&action=dk_innabox");
 						visit_url("place.php?whichplace=forestvillage&action=fv_untinker");
 					}

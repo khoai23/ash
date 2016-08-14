@@ -120,7 +120,7 @@ void find_boneKnife() {
 		print_quest_complete("Electric boning knife already found.");
 		return;
 	}
-	obtain(1, $item[electric boning knife], $location[The Castle in the Clouds in the Sky (Ground Floor)]);
+	obtain_item(1, $item[electric boning knife], $location[The Castle in the Clouds in the Sky (Ground Floor)]);
 }
 
 boolean skyHoleAvailable() {
@@ -149,7 +149,7 @@ void TrashQuest()
 					if(!contains_text(visit_url("plains.php"),"bathole_4.gif") && !contains_text(visit_url("plains.php"),"bathole_3.gif")) {
 						BatQuest();
 					}
-					obtain(1, $item[enchanted bean], $location[The Beanbat Chamber]);
+					obtain_item(1, $item[enchanted bean], $location[The Beanbat Chamber]);
 				}
 
 				visit_url("place.php?whichplace=plains&action=garbage_grounds");
@@ -159,7 +159,7 @@ void TrashQuest()
 				if (!have_item($item[S.O.C.K.])) {
 					set_choices(182,5); 
 					print_debug("Set choice to get model airship and then combat.");
-					obtain(1, $item[S.O.C.K.], $location[The Penultimate Fantasy Airship]);
+					obtain_item(1, $item[S.O.C.K.], $location[The Penultimate Fantasy Airship]);
 				} else {
 					print_goal_complete("You have found your personal airship. Go you!");
 				}

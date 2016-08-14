@@ -25,7 +25,7 @@ void confrontSorceress(boolean haveWand) {
 
 void wandFinder() {
 	if(contains_text(visit_url("questlog.php?which=1"),"Frank thinks you can defeat the Sorceress using the wand of Nagamar")) {
-		obtain(1,$item[Wand of Nagamar],$location[The VERY Unquiet Garves]);
+		obtain_item(1,$item[Wand of Nagamar],$location[The VERY Unquiet Garves]);
 		return;
 	}
 	if(have_item($item[disassembled clover]) || have_item($item[ten-leaf clover])) 
@@ -35,16 +35,16 @@ void wandFinder() {
 			create(1,$item[Wand of Nagamar]);
 		}
 	if(!have_item($item[ruby W])) {
-		obtain(1,$item[ruby W],$location[Pandamonium Slums]);
+		obtain_item(1,$item[ruby W],$location[Pandamonium Slums]);
 	}
 	if(!have_item($item[metallic A])) {
-		obtain(1,$item[metallic A],$location[The Penultimate Fantasy Airship]);
+		obtain_item(1,$item[metallic A],$location[The Penultimate Fantasy Airship]);
 	}
 	if(!have_item($item[ruby W])) {
-		obtain(1,$item[lowercase N],$location[The Valley of Rof L'm Fao]);
+		obtain_item(1,$item[lowercase N],$location[The Valley of Rof L'm Fao]);
 	}
 	if(!have_item($item[heavy D])) {
-		obtain(1,$item[heavy D],$location[The Castle in the Clouds in the Sky (Basement)]);
+		obtain_item(1,$item[heavy D],$location[The Castle in the Clouds in the Sky (Basement)]);
 	}
 	create(1,$item[Wand of Nagamar]);
 }

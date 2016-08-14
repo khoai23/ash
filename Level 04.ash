@@ -6,7 +6,7 @@ void sonarUse() {
 		use(item_amount($item[sonar-in-a-biscuit]),$item[sonar-in-a-biscuit]);
 	if(!have_item($item[enchanted bean]) && 
 	(contains_text(visit_url("bathole.php"),"bathole_4.gif") || contains_text(visit_url("bathole.php"),"bathole_3.gif")))
-		obtain(1,$item[enchanted bean],$location[The Beanbat Chamber]);
+		obtain_item(1,$item[enchanted bean],$location[The Beanbat Chamber]);
 }
 
 void BatQuest()
@@ -21,7 +21,7 @@ void BatQuest()
 			} else if(user_confirm("Do you wish to find stench resistance in the entryway instead?")) {
 				set_backup_state();
 				maximize_item();
-				obtain(1,$item[Pine-Fresh air freshener], $location[The Bat Hole Entrance]);
+				obtain_item(1,$item[Pine-Fresh air freshener], $location[The Bat Hole Entrance]);
 				get_backup_state();
 			} else {
 				abort("Please boost stench resistance and try again.");

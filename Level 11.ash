@@ -23,12 +23,19 @@ void tileSolver(string input) {
 	matcher tileMap = create_matcher("tile\\w+\\.gif",visit_url("main.php"));
 	int count=0;
 	string row;
+	int[7] tileNumber;
 	while(find(tileMap)) {
 		if(count%9==0) row = "";
 		count+=1;
+		if(group(tileMap).char_at(4)==answer[6-(count-1)/9])  tileNumber[6-(count-1)/9] = to_int(count%9)-1;
 		row += group(tileMap).char_at(4) + " ";
-		if(count%9==0) print(row);
+		if(count%9==0) print_debug(row);
 		if(count>63) abort("Failed parsing.");
+	}
+	for i from 0 upto 6 {
+		print_debug("Tile "+ (tileNumber[i]+1) + ", link "+"tiles.php?action=jump&whichtile=" + tileNumber[i]);
+		visit_url("tiles.php?action=jump&whichtile=" + tileNumber[i]);
+		waitq(1);
 	}
 }
 
@@ -52,26 +59,6 @@ string hiddenTempleAdventure() {
 		page = visit_url("choice.php");
 		print_debug("Parse the map and get your path.");
 		tileSolver(page);
-		int i = 0;
-		int count = 0;
-		string[63] mapping;
-		while(i>=5) {
-			i= index_of(page,"/tile",i);
-			i+=5;
-			mapping[count] = char_at(page,i);		
-		}
-		if(count!=63) abort("Parsing failed. Solve it yourself.");
-		print_goal("Parsing completed. Begin navigating.");
-		for row from 0 upto 6 {
-			for column from 1 upto 9 {
-				if(mapping[(6-row)*9+column-1]==answer[row]){
-					print("Jump to tile " + column +" row "+ row + " char " + mapping[(6-row)*9+column-1]);
-					visit_url("tiles.php?action=jump&whichtile=" + column);
-					waitq(1);
-					break;
-				}
-			}
-		}
 		print_debug("Do nothing to unlock.");
 		page = manual_run_choice(125,3);
 	} else {
@@ -177,8 +164,8 @@ void TempleQuest()
 	if(!hiddenCityOpened()) {
 		if(!have_item($item[The Nostril of The Serpent]) && !user_confirm("Did you acquired the Nostril?")) {
 			print_goal("Searching for the nostril of the serpent.");
-			obtain(1,$item[The Nostril of The Serpent],$location[The Hidden Temple]);
-		} 
+			obtain_item(1,$item[The Nostril of The Serpent],$location[The Hidden Temple]);
+		}
 		
 		custom_fight("hiddenCityOpened","hiddenTempleAdventure");
 	} else {
@@ -193,7 +180,7 @@ void HiddenCityQuest()
 			if(pulls_remaining()==0 || !user_confirm("Do you wish to pull the machete instead?")) {
 				print_goal("Searching for machete");
 				set_choices(789,2);
-				obtain(1,$item[antique machete],$location[The Hidden Park]);
+				obtain_item(1,$item[antique machete],$location[The Hidden Park]);
 			} else {
 				take_storage(1,$item[antique machete]);
 			}
@@ -201,7 +188,7 @@ void HiddenCityQuest()
 		
 		set_backup_state();
 		equip($slot[weapon],$item[antique machete]);
-		if(!contains_text(visit_url("place.php?whichplace=hiddencity"),"The Hidden Apartment Building")){
+		if(!contains_text(visit_url("place.php?whichplace=hiddencity"),"hc_apt.gif")){
 			print_goal("Unlocking Apartment..");
 			set_choices(781,1);
 			while(get_last_encounter() != "Earthbound and Down") {
@@ -209,7 +196,7 @@ void HiddenCityQuest()
 				adv1($location[An Overgrown Shrine (Northwest)]);
 			}
 		}
-		if(!contains_text(visit_url("place.php?whichplace=hiddencity"),"The Hidden Office Building")){
+		if(!contains_text(visit_url("place.php?whichplace=hiddencity"),"hc_office.gif")){
 			print_goal("Unlocking Office..");
 			set_choices(785,1);
 			while(get_last_encounter() != "Air Apparent") {
@@ -217,7 +204,7 @@ void HiddenCityQuest()
 				adv1($location[An Overgrown Shrine (Northeast)]);
 			}
 		}
-		if(!contains_text(visit_url("place.php?whichplace=hiddencity"),"The Hidden Hospital")){
+		if(!contains_text(visit_url("place.php?whichplace=hiddencity"),"hc_hospital.gif")){
 			print_goal("Unlocking Hospital..");
 			set_choices(783,1);
 			while(get_last_encounter() != "Water You Dune") {
@@ -225,7 +212,7 @@ void HiddenCityQuest()
 				adv1($location[An Overgrown Shrine (Southwest)]);
 			}
 		}
-		if(!contains_text(visit_url("place.php?whichplace=hiddencity"),"The Hidden Bowling Alley")){
+		if(!contains_text(visit_url("place.php?whichplace=hiddencity"),"hc_bowling.gif")){
 			print_goal("Unlocking Bowling Alley..");
 			set_choices(787,1);
 			while(get_last_encounter() != "Fire When Ready") {
@@ -265,7 +252,7 @@ void HiddenCityQuest()
 			if(!have_item($item[scorched stone sphere])) {
 				print_goal("Searching for scorched sphere.");
 				set_choices(788,1);
-				obtain(1,$item[scorched stone sphere],$location[The Hidden Bowling Alley]);
+				obtain_item(1,$item[scorched stone sphere],$location[The Hidden Bowling Alley]);
 			} else {
 				print_goal_complete("Had scorched sphere already.");
 			}
@@ -355,15 +342,18 @@ void LordSpookyravenQuest()
 		}
 
 		if (contains_text(visit_url("questlog.php?which=1"),"blasting soda")) {
+			set_backup_state();
+			maximize_item();
 			print_goal("Find Vinegar bottle");
 			if(!have_item($item[bottle of Chateau de Vinegar])) {
-				obtain(1,$item[bottle of Chateau de Vinegar],$location[The Haunted Wine Cellar]);
+				obtain_item(1,$item[bottle of Chateau de Vinegar],$location[The Haunted Wine Cellar]);
 			}			
 			
 			print_goal("Find blasting soda");
 			if(!have_item($item[blasting soda])) {
-				obtain(1,$item[blasting soda],$location[The Haunted Laundry Room]);
+				obtain_item(1,$item[blasting soda],$location[The Haunted Laundry Room]);
 			}
+			get_backup_state();
 		} else if (!contains_text(visit_url("questlog.php?which=1"),"-or-") &&
 			contains_text(visit_url("questlog.php?which=1"),"loosening powder")){
 			abort("Screw YOUR scavenger hunt. Find that spectacles.");
@@ -379,7 +369,7 @@ void LordSpookyravenQuest()
 		if (contains_text(visit_url("questlog.php?which=1"),"Heat up the explosive mixture")) {
 			print_goal("Heat the bomb up");
 			if(have_equipped($item[unstable fulminate]) || equip($item[unstable fulminate])) {
-				obtain(1,$item[wine bomb],$location[The Haunted Boiler Room]);
+				obtain_item(1,$item[wine bomb],$location[The Haunted Boiler Room]);
 			} else {
 				abort("Manually equip the unstable fulminate in hand and try again.");
 			}
@@ -447,7 +437,7 @@ void PalindomeQuest()
 					if (item_amount($item[snakehead charrrm]) < 2)
 					{
 						print_goal("Search for snakehead charrrm");
-						obtain(2-item_amount($item[snakehead charrrm]), $item[snakehead charrrm], $location[Belowdecks]);
+						obtain_item(2-item_amount($item[snakehead charrrm]), $item[snakehead charrrm], $location[Belowdecks]);
 					}
 					// the item are made automatically by KolMafia.
 				}
@@ -498,7 +488,7 @@ void PalindomeQuest()
 					take_storage(1,$item[wet stunt nut stew]);
 				} else {
 					print_goal("Search for wet stunt nut stew");
-					obtain(1, $item[wet stunt nut stew], $location[Inside the Palindome]);
+					obtain_item(1, $item[wet stunt nut stew], $location[Inside the Palindome]);
 				}
 				visit_url("place.php?whichplace=palindome&action=pal_mroffice");
 			}
@@ -560,7 +550,7 @@ void DesertQuest()
 		
 		// searching for stone rose
 		if((get_property("gnasirProgress").to_int() & 1) == 0 && !have_item($item[stone rose])) {
-			obtain(1,$item[stone rose],$location[The Oasis]);
+			obtain_item(1,$item[stone rose],$location[The Oasis]);
 		}
 		
 		// acquiring can of black paint
@@ -602,7 +592,7 @@ void DesertQuest()
 						take_storage(1,$item[drum machine]);
 					} else {
 						print_goal("Farming for drum machine..");
-						obtain(1,$item[drum machine],$location[The Oasis]);
+						obtain_item(1,$item[drum machine],$location[The Oasis]);
 					}
 				}
 				use(1,$item[drum machine]);
@@ -618,10 +608,12 @@ void DesertQuest()
 
 void PyramidQuest()
 {
+	if (!contains_text(visit_url("beach.php"),"pyramid.gif")) {
+		abort("The Small Pyramid is not currently available.");
+	} else {
+		visit_url("place.php?whichplace=desertbeach&action=db_pyramid1");
+	}
 	if (contains_text(visit_url("questlog.php?which=1"),"A Pyramid Scheme")) {
-		if (!contains_text(visit_url("beach.php"),"pyramid.gif")) {
-			abort("The Small Pyramid is not currently available.");
-		}
 
 		if(!contains_text(visit_url("questlog.php?which=1"),"A Pyramid Scheme")) {
 			if(!have_item($item[Staff of Ed])) {
@@ -639,7 +631,7 @@ void PyramidQuest()
 			open_location("place.php?whichplace=pyramid","pyramid_controlroom.gif",$location[The Middle Chamber]);
 			print_goal("Get 10 wheel-turning device");
 			if(item_amount($item[crumbling wooden wheel])+item_amount($item[tomb ratchet])<10) {
-				obtain(10-item_amount($item[tomb ratchet]),$item[tomb ratchet],$location[The Middle Chamber]);
+				obtain_item(10-item_amount($item[tomb ratchet]),$item[tomb ratchet],$location[The Middle Chamber]);
 			}
 			
 			if(!have_item($item[ancient bomb])) {
@@ -677,7 +669,7 @@ void PyramidQuest()
 
 void MacGuffinQuest()
 {
-    if (my_level() >= 11) {
+   if (my_level() >= 11) {
         council();
 
 		if (contains_text(visit_url("questlog.php?which=1"),"and the Quest for the Holy MacGuffin")) {

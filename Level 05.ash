@@ -14,7 +14,7 @@ void GoblinQuest()
 			if (!contains_text(visit_url("plains.php"),"knob2.gif")) {
 				if (!have_item($item[Knob Goblin encryption key])) {
 					print_goal("Search for encryption key.");
-					obtain(1, $item[Knob Goblin encryption key], $location[The Outskirts of Cobb's Knob]);
+					obtain_item(1, $item[Knob Goblin encryption key], $location[The Outskirts of Cobb's Knob]);
 				}
 				use(1, $item[Cobb's Knob map]);
 			} else {

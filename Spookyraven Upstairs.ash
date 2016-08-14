@@ -1,5 +1,4 @@
 import <QuestLib.ash>;
-import <zlib.ash>;
 import <Spookyraven.ash>;
 
 void set_bathroom_choices() {
@@ -47,7 +46,7 @@ void SpookyravenUpstairs()
 		if (!have_item($item[Lord Spookyraven's spectacles]))
 		{
 			print_goal("Searching for spectacles");
-			obtain(1, $item[Lord Spookyraven's spectacles], $location[The Haunted Bedroom]);
+			obtain_item(1, $item[Lord Spookyraven's spectacles], $location[The Haunted Bedroom]);
 			set_bedroom_choices();
 		} else {
 			print_goal_complete("Spectacles acquired.");
@@ -55,21 +54,21 @@ void SpookyravenUpstairs()
 
 		if(!have_item($item[Lady Spookyraven's finest gown])) {
 			print_goal("Searching for gown");
-			obtain(1, $item[Lady Spookyraven's finest gown], $location[The Haunted Bedroom]);
+			obtain_item(1, $item[Lady Spookyraven's finest gown], $location[The Haunted Bedroom]);
 		} else {
 			print_goal_complete("Gown acquired. Skipping Bedroom.");
 		}
 		
 		if(!have_item($item[Lady Spookyraven's powder puff])) {
 			print_goal("Searching for puff");
-			obtain(1, $item[Lady Spookyraven's powder puff], $location[The Haunted Bathroom]);
+			obtain_item(1, $item[Lady Spookyraven's powder puff], $location[The Haunted Bathroom]);
 		} else {
 			print_goal_complete("Puff acquired. Skipping Bathroom.");
 		}
 		
 		if(!have_item($item[Lady Spookyraven's dancing shoes])) {
 			print_goal("Searching for shoes");
-			obtain(1, $item[Lady Spookyraven's dancing shoes], $location[The Haunted Gallery]);
+			obtain_item(1, $item[Lady Spookyraven's dancing shoes], $location[The Haunted Gallery]);
 		} else {
 			print_goal_complete("Shoes acquired. Skipping Gallery.");
 		}
@@ -90,7 +89,7 @@ void GuyMadeOfBeeQuest() {
 		if (!have_item($item[antique hand mirror]))	{
 			print_goal("Searching for mirror");
 			set_bedroom_choices();
-			obtain(1, $item[antique hand mirror], $location[The Haunted Bedroom]);
+			obtain_item(1, $item[antique hand mirror], $location[The Haunted Bedroom]);
 		}
 
 		if (guyMadeOfBeesCount < 4) {

@@ -66,7 +66,7 @@ void TrapperQuest()
 					set_backup_state();
 					print_goal("Farming for cheese.");
 					maximize_item();
-					obtain(3,$item[goat cheese],$location[The Goatlet]);
+					obtain_item(3,$item[goat cheese],$location[The Goatlet]);
 					get_backup_state();
 				} else {
 					print_goal_complete("Have enough cheese.");

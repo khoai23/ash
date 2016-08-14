@@ -1,5 +1,5 @@
 import <QuestLib.ash>;
-import <zlib.ash>;
+import <Misc.ash>;
 
 void set_pirate_choices() {
 	// Test of tsterone
@@ -177,6 +177,10 @@ void useTools() {
 void PirateQuest()
 {
 	set_pirate_choices();
+	
+	//if(!contains_text(visit_url("main.php"),"island.gif")) {
+		JunkShipQuest();
+	//}
 
 	if (!have_item($item[pirate fledges]) && equipped_amount($item[pirate fledges])==0)
 	{
@@ -241,7 +245,7 @@ void PirateQuest()
 						if (knoll_available()) {
 							buy(1, $item[frilly skirt]);
 						} else if(user_confirm("Do you want to search for a frilly skirt?")) {
-							obtain(1,$item[frilly skirt],$location[The Degrassi Knoll Gym]);
+							obtain_item(1,$item[frilly skirt],$location[The Degrassi Knoll Gym]);
 						} else {
 							print_minor_warning("Not getting a frilly skirt");
 						}
