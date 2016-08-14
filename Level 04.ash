@@ -1,5 +1,4 @@
 import <QuestLib.ash>;
-import <zlib.ash>;
 
 void sonarUse() {
 	if(have_item($item[sonar-in-a-biscuit]))

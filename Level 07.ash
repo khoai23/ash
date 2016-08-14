@@ -12,7 +12,7 @@ boolean lastMonsterBossNiche() {
 }
 
 string olfactHandling() {
-	string page = visit_url("adventure.php?snarfblat=263");
+	string page = visit_url(to_url($location[The Defiled Niche]));
 	
 	if(contains_text(page,"Combat")) {
 		if(contains_text(page,"dirty old lihc") && have_effect($effect[On The Trail])==0) {

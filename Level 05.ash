@@ -1,5 +1,4 @@
 import <QuestLib.ash>;
-import <zlib.ash>;
 
 boolean haveHaremOutfit() {
 	return have_outfit("Knob Goblin Harem Girl Disguise") || is_wearing_outfit("Knob Goblin Harem Girl Disguise");

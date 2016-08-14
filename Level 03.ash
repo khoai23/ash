@@ -1,5 +1,4 @@
 import <QuestLib.ash>;
-import <zlib.ash>;
 
 record array {
 	int value;

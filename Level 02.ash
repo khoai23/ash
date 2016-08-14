@@ -5,7 +5,7 @@ boolean larva = false;
 boolean templeMap = true;
 
 string searchWood(boolean target) {
-	buffer page = visit_url("adventure.php?snarfblat=15");
+	buffer page = visit_url(to_url($location[The Spooky Forest]));
 	
 	if(contains_text(page,"Combat")) {
 		run_combat();
