@@ -41,7 +41,7 @@ void tileSolver(string input) {
 
 string hiddenTempleAdventure() {
 	// the function must be run AFTER having the Nostril
-	string page = visit_url("adventure.php?snarfblat=280");
+	string page = visit_url(to_url($location[The Hidden Temple]));
 	
 	if(contains_text(page,"Combat")) {
 		page = run_combat();
@@ -394,7 +394,7 @@ void LordSpookyravenQuest()
 }
 
 string takeDogPhoto() {
-	string page = visit_url("adventure.php?snarfblat=386");
+	string page = visit_url(to_url($location[Inside The Palindome]));
 	if(contains_text(page,"Combat")) {
 		if(contains_text(page,"Racecar") && !have_item($item[photograph of a dog])) {
 			page = throw_item($item[disposable instant camera]);

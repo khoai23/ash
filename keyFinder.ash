@@ -100,7 +100,7 @@ void digitalKey() {
 
 void skeletonKey() {
 	if(have_item($item[skeleton key])) {
-		vprint("Have skeleton key.","green",1);
+		print_quest_complete("Have skeleton key.");
 		return;
 	}
 	while(!have_item($item[skeleton key]) && !(have_item($item[loose teeth]) && have_item($item[skeleton bone]))) {
@@ -114,24 +114,24 @@ void main() {
 	if(!have_item($item[digital key])) {
 		digitalKey();
 	} else {
-		vprint("Digital key acquired.","green",1);
+		print_goal_complete("Digital key acquired.");
 	}
 	
 	if(!have_item($item[skeleton key])) {
 		skeletonKey();
 	} else {
-		vprint("Skeleton key acquired.","green",1);
+		print_goal_complete("Skeleton key acquired.");
 	}
 	
 	if(!deityKey()) {
 		//vprint("You don't have enough tokens.","red",1);
 	} else {
-		vprint("Deity keys acquired.","green",1);
+		print_goal_complete("Deity keys acquired.");
 	}
 	if(!have_item($item[Richard's star key])) {
 		if(my_level()<10) abort("Not enough level to even try for star key.");
 		starKey();
 	} else {
-		vprint("Star key acquired.","green",1);
+		print_goal_complete("Star key acquired.");
 	}
 }

@@ -12,12 +12,16 @@ void confrontSorceress(boolean haveWand) {
 			macroId = "109152"; // physical
 	}
 	visit_url("place.php?whichplace=nstower&action=ns_10_sorcfight");
-	run_macro(macroId);
+	use_macro(macroId);
+	run_combat();
+	waitq(1);
 	visit_url("fight.php");
-	run_macro(macroId);
+	use_macro(macroId);
+	run_combat();
+	waitq(1);
 	string page=visit_url("fight.php");
 	if(!contains_text(page,"You wake up in a heap")) {
-		vprint("Allow wand searching in cemetery.");
+		print_debug("Allow wand searching in cemetery.");
 		visit_url("choice.php");
 		manual_run_choice(1016,1);
 	}
@@ -33,6 +37,7 @@ void wandFinder() {
 			if(!have_item($item[ten-leaf clover])) use(1,$item[disassembled clover]);
 			adv1($location[The Castle in the Clouds in the Sky (Basement)],-1,"");
 			create(1,$item[Wand of Nagamar]);
+			return;
 		}
 	if(!have_item($item[ruby W])) {
 		obtain_item(1,$item[ruby W],$location[Pandamonium Slums]);
@@ -50,6 +55,8 @@ void wandFinder() {
 }
 
 void shadowKilling() {
+	set_backup_state();
+	maximize_hp();
 	if(my_maxhp()<250) abort("Your total health is too low to use this script.");
 	if((!have_item($item[scented massage oil]) && !have_item($item[soggy used band-aid])) &&
 	   (item_amount($item[scented massage oil])+item_amount($item[soggy used band-aid])<2 && my_maxhp()<400) &&
@@ -93,6 +100,7 @@ void shadowKilling() {
 			}
 		}
 	}
+	get_backup_state();
 }
 
 void NaughtyQuest() {
@@ -101,6 +109,7 @@ void NaughtyQuest() {
 
 		string page;
 		if (contains_text(visit_url("questlog.php?which=1"),"The Ultimate Final Epic Conflict of the Ages")) {
+			set_backup_state();
 			if(contains_text(visit_url("place.php?whichplace=nstower"),"nstower_regdesk.gif")) {
 				print_goal("Register every contest available.");
 				page = visit_url("place.php?whichplace=nstower&action=ns_01_contestbooth");
@@ -152,8 +161,7 @@ void NaughtyQuest() {
 				print_goal_complete("Dealed with the contest.");
 			}
 			
-			if(contains_text(visit_url("place.php?whichplace=nstower"),"ns_02_coronation")) {
-				abort("Get the filename of courtyard image!");
+			if(contains_text(visit_url("place.php?whichplace=nstower"),"nstower_courtyard.gif")) {
 				visit_url("place.php?whichplace=nstower&action=ns_02_coronation");
 				manual_run_choice(1020,1);
 				manual_run_choice(1021,1);

@@ -158,7 +158,9 @@ void LOLQuest()
 				
 				maximize_for_ghost();
 				print_goal("Using a-boo clue.");
+				set_choices(611,1);
 				while(have_item($item[a-boo clue])) {
+					restore_hp(my_maxhp());
 					while_abort();
 					use(1,$item[a-boo clue]);
 					adventure(1,$location[A-Boo Peak]);

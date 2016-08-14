@@ -253,7 +253,15 @@ void maximize_stench() {
 	maximize("stench resistance", !get_recklessness());
 }
 
+void maximize_hp() {
+	maximize("maximum hp",false);
+}
+
 void maximize_for_ghost(){
+	if (have_familiar($familiar[Exotic Parrot])) {
+		use_familiar($familiar[Exotic Parrot]);
+	}
+	
 	if(pulls_remaining()>0) {
 		if(storage_amount($item[topiary tights])>0&&!have_item($item[topiary tights])) {
 			take_storage(1,$item[topiary tights]);
@@ -281,7 +289,12 @@ void maximize_for_ghost(){
 		}
 	}
 	
-	maximize("maximum hp, cold resistance, spooky resistance", !get_recklessness());
+	if(have_effect($effect[Go Get 'Em\, Tiger!])==0) {
+		buy(1,$item[Ben-Gal&trade; Balm]);
+		use(1,$item[Ben-Gal&trade; Balm]);
+	}
+	
+	maximize("maximum hp, cold resistance, spooky resistance", false);
 	
 	int checker = check_survive_clue();
 	if(checker>0) {

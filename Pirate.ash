@@ -117,7 +117,7 @@ string pirate_fight(boolean insult) {
 		}
 	}
 
-	string page = visit_url("adventure.php?snarfblat=157");
+	string page = visit_url(to_url($location[Barrrney's Barrr]));
 	
 	if (contains_text(page, "Combat"))
 	{
@@ -318,7 +318,7 @@ void PirateQuest()
 			get_backup_state();
 		}
 	} else {
-		print_quest_complete("You have already have the pirate fledges.");
+		print_quest_complete("You already have the pirate fledges.");
 	}
 	
 }

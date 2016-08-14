@@ -31,16 +31,16 @@ string beeKiller(boolean side) {
 
 void runFlyerDefault(boolean side) {
 	if(get_property("sidequestArenaCompleted")=="fratboy" || get_property("sidequestArenaCompleted")=="hippy") {
-		vprint("Arena sidequest completed as " + get_property("sidequestArenaCompleted"));
+		print_quest_complete("Arena sidequest completed as " + get_property("sidequestArenaCompleted"));
 		return;
 	}
 	string warOutfit = "Frat Warrior Fatigue";
 	if(side == side_hippy) {warOutfit = "War Hippy Fatigue"; outfit_c = 1; }
-	set_backup_state()
+	set_backup_state();
 	print_debug("Use outfit: " + warOutfit);
 	outfit(warOutfit);
 	visit_url("bigisland.php?place=concert");
-	get_backup_state()
+	get_backup_state();
 	
 	int guyMadeOfBeesCount = get_property("guyMadeOfBeesCount").to_int();
 	if(guyMadeOfBeesCount<4) {
@@ -61,7 +61,7 @@ void runFlyerDefault(boolean side) {
 	
 	outfit(warOutfit);
 	visit_url("bigisland.php?place=concert");
-	get_backup_state()
+	get_backup_state();
 }
 
 void dewormOrchard(boolean side) {
@@ -70,7 +70,7 @@ void dewormOrchard(boolean side) {
 		return;
 	}
 	// save current outfit for adventuring
-	set_backup_state()
+	set_backup_state();
 	// determine outfit by which is available
 	string war_outfit;
 	if(side==side_hippy) war_outfit = "War Hippy Fatigue";
@@ -80,9 +80,9 @@ void dewormOrchard(boolean side) {
 	// use outfit to receive quest
 	outfit(war_outfit);
 	visit_url("bigisland.php?place=orchard&action=stand&pwd");	
-	get_backup_state()
+	get_backup_state();
 	
-	vprint("Searching for scent gland...");
+	print_goal("Kill the worm queen.");
 	while (have_effect($effect[Filthworm Guard Stench]) == 0) {
       while (have_effect($effect[Filthworm Drone Stench]) == 0) {
          while (have_effect($effect[Filthworm Larva Stench]) == 0) {
@@ -111,7 +111,7 @@ void dewormOrchard(boolean side) {
    visit_url("bigisland.php?place=orchard&action=stand&pwd");	
    // receive meat
    visit_url("bigisland.php?place=orchard&action=stand&pwd");
-   get_backup_state()
+   get_backup_state();
 }
 
 void bombSearch(boolean side) {
@@ -121,7 +121,7 @@ void bombSearch(boolean side) {
 	}
 	string warOutfit = "Frat Warrior Fatigue";
 	if(side == side_hippy) warOutfit = "War Hippy Fatigue";
-	set_backup_state()
+	set_backup_state();
 	outfit(warOutfit);
 	print_debug("Use outfit: " + warOutfit);
 	print_goal("Meet bombmaker.");
@@ -130,7 +130,7 @@ void bombSearch(boolean side) {
 	obtain(5, "barrel of gunpowder", $location[sonofa beach]);
 	print_goal("Deliver payload.");
     visit_url("bigisland.php?place=lighthouse&action=pyro&pwd");
-	get_backup_state()
+	get_backup_state();
 }
 
 boolean haveAllTools() {
@@ -141,7 +141,7 @@ boolean haveAllTools() {
 string searchTools() {
 	buffer page;
 	if(!have_item($item[molybdenum hammer])) {
-		page = visit_url("adventure.php?snarfblat=182");
+		page = visit_url(to_url($location[Next to that Barrel with Something Burning in it]));
 		if(!contains_text(page,"batwinged gremlin")) {
 			page = run_combat();
 		} else {
@@ -159,7 +159,7 @@ string searchTools() {
 			}
 		}
 	} else if(!have_item($item[molybdenum crescent wrench])) {
-		page = visit_url("adventure.php?snarfblat=184");
+		page = visit_url(to_url($location[Over Where the Old Tires Are]));
 		if(!contains_text(page,"erudite gremlin")) {
 			page = run_combat();
 		} else {
@@ -177,7 +177,7 @@ string searchTools() {
 			}
 		}
 	} else if(!have_item($item[molybdenum pliers])) {
-		page = visit_url("adventure.php?snarfblat=183");
+		page = visit_url(to_url($location[Near an Abandoned Refrigerator]));
 		if(!contains_text(page,"spider gremlin")) {
 			page = run_combat();
 		} else {
@@ -195,7 +195,7 @@ string searchTools() {
 			}
 		}
 	} else if(!have_item($item[molybdenum screwdriver])) {
-		page = visit_url("adventure.php?snarfblat=185");
+		page = visit_url(to_url($location[Out by that Rusted-Out Car]));
 		if(!contains_text(page,"vegetable gremlin")) {
 			page = run_combat();
 		} else {
@@ -225,17 +225,17 @@ void findTools(boolean side) {
 	}
 	string warOutfit = "Frat Warrior Fatigue";
 	if(side == side_hippy) warOutfit = "War Hippy Fatigue";
-	set_backup_state()
+	set_backup_state();
 	print_debug("Use outfit: " + warOutfit);
 	outfit(warOutfit);
 	visit_url("bigisland.php?action=junkman&pwd");
-	get_backup_state()
+	get_backup_state();
 	
 	custom_fight("haveAllTools","searchTools");
 	
 	outfit(warOutfit);
 	visit_url("bigisland.php?action=junkman&pwd");
-	get_backup_state()
+	get_backup_state();
 }
 
 boolean haveWarriorFratOutfit() {
@@ -252,7 +252,7 @@ boolean warStarted() {
 
 void StartWar() {
 	if(contains_text(visit_url("questlog.php?which=1"),"see if you can't stir up some trouble")) {
-		set_backup_state()
+		set_backup_state();
 		if(!haveWarriorFratOutfit())
 			if(pulls_remaining()>=3 && user_confirm("Do you wish to pull outfit and bypass this part?")) {
 				if(!have_item($item[beer helmet])) take_storage(1,$item[beer helmet]);
@@ -274,7 +274,7 @@ void StartWar() {
 		print_goal("Assassinating Franz Ferdinand.");
 		fulfill_condition("warStarted",$location[Wartime Hippy Camp (Frat Disguise)]);
 		print_debug("Rollback to checkpoint outfit.");
-		get_backup_state()
+		get_backup_state();
 	} else {
 		print_quest_complete("War had started. By you. Congratulation, warmonger. Be proud of yourself.");
 	}
@@ -296,7 +296,7 @@ void FightWar(boolean side) {
 		abort("This part is not automated.");
 	} else {
 		print_goal("End war as a frat.");
-		set_backup_state()
+		set_backup_state();
 			print_debug("Flyering.");
 			runFlyerDefault(side);
 			print_debug("Search for Yossarian's tools.");
@@ -310,7 +310,7 @@ void FightWar(boolean side) {
 			while_abort();
 			adventure(1,$location[The Battlefield (Frat Uniform)]);
 		}
-		get_backup_state()
+		get_backup_state();
 			print_debug("Killing the filthworm queen.");
 			dewormOrchard(side);
 		outfit(warOutfit);
@@ -319,9 +319,10 @@ void FightWar(boolean side) {
 			adventure(1,$location[The Battlefield (Frat Uniform)]);
 		}
 		print_goal("Finish the Big Whatever.");
+		maximize_strength();
 		visit_url("bigisland.php?action=bossfight&pwd");
 		run_combat();
-		get_backup_state()
+		get_backup_state();
 	}
 	council();
 }

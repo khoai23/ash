@@ -3,7 +3,7 @@ import <zlib.ash>;
 
 void sonarUse() {
 	if(have_item($item[sonar-in-a-biscuit]))
-		use(item_amount($item[sonar-in-a-biscuit]),$item[sonar-in-a-biscuit]);
+		use(1,$item[sonar-in-a-biscuit]);
 	if(!have_item($item[enchanted bean]) && 
 	(contains_text(visit_url("bathole.php"),"bathole_4.gif") || contains_text(visit_url("bathole.php"),"bathole_3.gif")))
 		obtain_item(1,$item[enchanted bean],$location[The Beanbat Chamber]);
@@ -29,7 +29,7 @@ void BatQuest()
 			
 			if(elemental_resistance($element[stench]) >= 10.00 && !contains_text(visit_url("bathole.php"),"bathole_4.gif")) {
 				print_goal("Finding the way to the boss room");
-				open_location("bathole.php","bathole_4.gif",$location[Guano Junction]);
+				open_location("bathole.php","bathole_4.gif","sonarUse",$location[Guano Junction]);
 				print_debug("Opened way to the boss room");
 			}
 			

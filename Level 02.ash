@@ -5,7 +5,6 @@ boolean larva = false;
 boolean templeMap = true;
 
 string searchWood(boolean target) {
-	set_backup_state();
 	buffer page = visit_url("adventure.php?snarfblat=15");
 	
 	if(contains_text(page,"Combat")) {
@@ -48,9 +47,7 @@ boolean haveLarva() {
 
 void MosquitoQuest()
 {
-    if (my_level() >= 2)
-	{
-        council();
+    if (my_level() >= 2) {
 
 		if (contains_text(visit_url("questlog.php?which=1"),"Looking for a Larva in All the Wrong Places"))	{
 			set_backup_state();
@@ -67,9 +64,9 @@ void MosquitoQuest()
 		} else {
 			print_warning("The level 2 quest is not currently available.");
 		}
-	}
-	else
-	{
+		
+        council();
+	} else {
 		print_not_qualified("You must be at least level 2 to attempt this quest.");
 	}
 }
