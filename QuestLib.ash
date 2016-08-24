@@ -1,3 +1,4 @@
+script "QuestLib.ash";
 import <zlib.ash>;
 
 /*
@@ -120,6 +121,13 @@ boolean have_saucepan() {
 	return false;
 }
 
+boolean have_accordion() {
+	if(have_item($item[toy accordion])) return true;
+	if(have_item($item[antique accordion])) return true;
+	if(my_class()==$class[accordion thief]) return true;
+	return false;
+}
+
 void run_pvp() {
 	if(contains_text(visit_url("campground.php"),"hippystone.gif")) {
 		visit_url("campground.php?pwd&smashstone=Yep.&confirm");
@@ -144,6 +152,8 @@ void increase_mcd() {
 }
 
 // CHOICE FUNCTION
+int[1] turtleTaming;
+turtleTaming[0] = 329;
 
 string run_choice( string page_text ) {
 	while( contains_text( page_text , "choice.php" ) )
@@ -165,6 +175,10 @@ string run_choice( string page_text ) {
 			manual_run_choice(189,1);
 			page_text = visit_url("ocean.php?lon=59&lat=10");
 			return page_text;
+		} 
+		if(my_class()==$class[Turtle Tamer]) {
+			print_debug("Handle Turtle Taming adventures");
+			if(turtleTaming contains to_int(choice_adv_num)) choice_num = "1";
 		}
 		
 		if( choice_num == "" ) abort( "Unsupported Choice Adventure!" );
@@ -182,12 +196,12 @@ void maximize_resist() {
 	if (have_familiar($familiar[Exotic Parrot])) {
 		use_familiar($familiar[Exotic Parrot]);
 	}
-	/*if(have_skill($skill[elemental saucesphere]) && have_saucepan()) {
+	if(have_skill($skill[elemental saucesphere]) && have_saucepan()) {
 		use_skill(1,$skill[elemental saucesphere]);
 	}
 	if(have_skill($skill[ghostly shell])) {
 		use_skill(1,$skill[ghostly shell]);
-	}*/
+	}
 	
 	maximize("all resistance", !get_recklessness());
 }
@@ -198,6 +212,14 @@ void maximize_item() {
 	} else if(have_familiar($familiar[Gelatinous Cubeling])) {
 		use_familiar($familiar[Gelatinous Cubeling]);
 	}
+	
+	if(have_skill($skill[Fat Leon's Phat Loot Lyric]) && have_accordion()) {
+		use_skill($skill[Fat Leon's Phat Loot Lyric]);
+	}
+	if(have_skill($skill[Singer's Faithful Ocelot])) {
+		use_skill(1,$skill[Singer's Faithful Ocelot]);
+	}	
+	
 	maximize("item drop",!get_recklessness());
 }
 
@@ -207,6 +229,11 @@ void maximize_meat() {
 	} else if(have_familiar($familiar[Leprechaun])) {
 		use_familiar($familiar[Leprechaun]);
 	}
+	
+	if(have_skill($skill[The Polka of Plenty]) && have_accordion()) {
+		use_skill(1,$skill[The Polka of Plenty]);
+	}
+	
 	maximize("meat drop",!get_recklessness());
 }
 
@@ -227,6 +254,22 @@ void maximize_strength() {
 			use_familiar($familiar[Adorable Space Buddy]);
 		}
 	}
+	if(my_primestat()==$stat[muscle]) {
+		if(have_effect($effect[Go Get 'Em\, Tiger!])==0) {
+			buy(5,$item[Ben-Gal&trade; Balm]);
+			use(5,$item[Ben-Gal&trade; Balm]);
+		}
+	} else if(my_primestat()==$stat[mysticality]) {
+		if(have_effect($effect[Glittering Eyelashes])==0) {
+			buy(5,$item[glittery mascara]);
+			use(5,$item[glittery mascara]);
+		}
+	} else {
+		if(have_effect($effect[Butt-Rock Hair])==0) {
+			buy(5,$item[hair spray]);
+			use(5,$item[hair spray]);
+		}
+	}
 	maximize("mainstat",false);
 }
 
@@ -243,6 +286,14 @@ void maximize_noncom() {
 		print_minor_warning("Familiar detrimental to progress.");
 		use_familiar($familiar[Mosquito]);
 	}
+	
+	if(have_skill($skill[The Sonata of Sneakiness]) && have_accordion()) {
+		use_skill(1,$skill[The Sonata of Sneakiness]);
+	}
+	if(have_skill($skill[Smooth Movement])) {
+		use_skill(1,$skill[Smooth Movement]);
+	}
+	
 	maximize("-combat",!get_recklessness());
 }
 
@@ -250,6 +301,14 @@ void maximize_com() {
 	if(have_familiar($familiar[Jumpsuited Hound Dog])) {
 		use_familiar($familiar[Jumpsuited Hound Dog]);
 	}
+	
+	if(have_skill($skill[Carlweather's Cantata of Confrontation]) && have_accordion()) {
+		use_skill(1,$skill[Carlweather's Cantata of Confrontation]);
+	}
+	if(have_skill($skill[Musk of the Moose])) {
+		use_skill(1,$skill[Musk of the Moose]);
+	}
+	
 	maximize("+combat",!get_recklessness());
 }
 
@@ -273,7 +332,7 @@ void maximize_hp() {
 	maximize("maximum hp",false);
 }
 
-void maximize_for_ghost(){
+boolean maximize_for_ghost(){
 	if (have_familiar($familiar[Exotic Parrot])) {
 		use_familiar($familiar[Exotic Parrot]);
 	}
@@ -316,8 +375,10 @@ void maximize_for_ghost(){
 	if(checker>0) {
 		if(my_maxhp()-my_hp()>checker) restore_hp(my_maxhp()-checker+1);
 	} else {
-		res_abort("You need "+(-checker+1)+"more max hp to clear it with clue.");
+		print_minor_warning("You need "+(-checker+1)+"more max hp to clear it with clue.");
+		return false;
 	}
+	return true;
 }
 
 void maximize_surgeon() {
@@ -431,7 +492,7 @@ void open_location(string parent_url, string loc, string add_exec, location plac
 }
 
 // DAILY FUNCTION
-int still_list = 5;
+int still_list = 11;
 item[int] still_ingr;
 item[int] still_res;
 still_ingr[1] = $item[bottle of rum]; still_res[1] = $item[bottle of Lieutenant Freeman];
@@ -439,7 +500,13 @@ still_ingr[2] = $item[olive]; still_res[2] = $item[cocktail onion];
 still_ingr[3] = $item[bottle of gin]; still_res[3] = $item[bottle of Calcutta Emerald];
 still_ingr[4] = $item[lemon]; still_res[4] = $item[kiwi];
 still_ingr[5] = $item[orange]; still_res[5] = $item[kumquat];
-still_ingr[6] = $item[soda water]; still_res[6] = $item[tonic water];
+still_ingr[6] = $item[strawberry]; still_res[6] = $item[raspberry];
+still_ingr[7] = $item[grapefruit]; still_res[7] = $item[tangerine];
+still_ingr[8] = $item[bottle of sake]; still_res[8] = $item[bottle of Pete's Sake];
+still_ingr[9] = $item[bottle of vodka]; still_res[9] = $item[bottle of Definit];
+still_ingr[10] = $item[boxed wine]; still_res[10] = $item[boxed champagne];
+still_ingr[11] = $item[bottle of tequila]; still_res[11] = $item[bottle of Jorge Sinsonte];
+still_ingr[20] = $item[soda water]; still_res[20] = $item[tonic water];
 
 void use_still() {
 	if(my_primestat()!=$stat[moxie]) {
@@ -451,10 +518,29 @@ void use_still() {
 		print_minor_warning("Out of converting juice. Return tomorrow.");
 		return;
 	}
+	
+	int[11] randomized_array;
+	if(false) {
+		for i from 1 upto still_list {
+			randomized_array[i-1] = -1;
+		}
+		int idx = 0;
+		for i from 1 upto still_list {
+			idx = random(still_list);
+			while(randomized_array[idx] != -1) idx = random(still_list);
+			randomized_array[idx] = i;
+		}
+	} else {
+		for i from 1 upto still_list {
+			randomized_array[i-1] = i;
+		}
+	}
+	
 	for i from 1 upto still_list {
 		if(stills_available()==0) return;
-		if(have_item(still_ingr[i])) {
-			create(min(stills_available(),item_amount(still_ingr[i])),still_res[i]);
+		if(have_item(still_ingr[randomized_array[i-1]])) {
+			create(min(stills_available(),item_amount(still_ingr[randomized_array[i-1]])),
+					still_res[randomized_array[i-1]]);
 		}
 	} 
 	if(stills_available()>0) {

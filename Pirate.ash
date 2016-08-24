@@ -103,7 +103,7 @@ string beer_pong(string page)
 		}
 	}
 
-	vprint("You won a thrilling game of Insult Beer Pong!", "green",1);
+	print_goal_complete("You won a thrilling game of Insult Beer Pong!");
 	return page;
 }
 
@@ -129,12 +129,12 @@ string pirate_fight(boolean insult) {
 	else if (contains_text(page, "Arrr You Man Enough?"))
 	{
 		int totalInsults = insult_count();
-		if (totalInsults > 6){
+		if (totalInsults >= 6){
 			print_debug("You have learned " + to_string(totalInsults) + "/8 pirate insults.");
 			page = beer_pong( visit_url( "choice.php?pwd&whichchoice=187&option=1" ) );
 		} else {
 			print_debug("You have learned " + to_string(totalInsults) + "/8 pirate insults.");
-			print_debug("Search for more insult..");
+			print_goal("Search for more insult..");
 			page = visit_url("choice.php?pwd&whichchoice=187&option=2" );
 		}
 	} else if (contains_text(page, "Arrr You Man Enough?")) {

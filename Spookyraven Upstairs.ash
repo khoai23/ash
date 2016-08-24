@@ -80,11 +80,13 @@ void SpookyravenUpstairs()
 	}
 }
 
-void GuyMadeOfBeeQuest() {
-	int guyMadeOfBeesCount = get_property("guyMadeOfBeesCount").to_int();
+boolean beeGeeReady() {
+	return get_property("guyMadeOfBeesCount").to_int() == 4;
+}
 
-	if (guyMadeOfBeesCount < 4 && 
-		user_confirm("Would you like to prep the guy made of bees? You have said his name " + guyMadeOfBeesCount + " time(s)."))
+void GuyMadeOfBeeQuest() {
+	if (!beeGeeReady() && 
+		user_confirm("Would you like to prep the guy made of bees? You have said his name " + get_property("guyMadeOfBeesCount") + " time(s)."))
 	{
 		if (!have_item($item[antique hand mirror]))	{
 			print_goal("Searching for mirror");
@@ -92,17 +94,16 @@ void GuyMadeOfBeeQuest() {
 			obtain_item(1, $item[antique hand mirror], $location[The Haunted Bedroom]);
 		}
 
-		if (guyMadeOfBeesCount < 4) {
+		if (!beeGeeReady()) {
+			set_backup_state();
+			maximize_noncom();
 			print_goal("Preparing the BeeGee for the upcoming quest.");
-			while(guyMadeOfBeesCount<4) {
-				while_abort();
-				adventure(1, $location[The Haunted Bathroom]);
-				guyMadeOfBeesCount = get_property("guyMadeOfBeesCount").to_int();
-			}
+			fulfill_condition("beeGeeReady",$location[The Haunted Bathroom]);
+			get_backup_state();
 		} else {
-			print_goal_complete("You have already said the Guy Made of Bees' name " + guyMadeOfBeesCount + " times already, he's ready to be summoned.");
+			print_goal_complete("You have already said the Guy Made of Bees' name " + get_property("guyMadeOfBeesCount") + " times already, he's ready to be summoned.");
 		}
-	} else if (guyMadeOfBeesCount == 4) {
+	} else if (beeGeeReady()) {
 		print_quest_complete("You have prepared the Guy Made of Bees.");
 	} else {
 		print_not_qualified("You consciously ignore the BeeGee.");
@@ -113,4 +114,5 @@ void GuyMadeOfBeeQuest() {
 void main()
 {
 	SpookyravenUpstairs();
+	GuyMadeOfBeeQuest();
 }

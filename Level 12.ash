@@ -1,5 +1,4 @@
 import <QuestLib.ash>;
-import <zlib.ash>;
 import <Spookyraven Upstairs.ash>;
 
 int outfit_c;
@@ -8,17 +7,31 @@ boolean side_frat = true;
 boolean side_hippy = false;
 
 boolean checkBeePollen() {
-	return have_item($item[guy made of bee pollen]);
+	return have_item($item[guy made of bee pollen]) || (last_monster()==$monster[Guy Made Of Bees]);
 }
 
 string beeKiller(boolean side) {
-	string page = visit_url("adventure.php?snarfblat=392");
+	string page = visit_url(to_url($location[The Haunted Bathroom]));
 	if(contains_text(page,"Combat")) {
 		if(contains_text(page,"Guy Made Of Bees")) {
 			if(side==side_frat) {
-				page=throw_items($item[rock band flyers],$item[antique hand mirror]);
+				if(have_skill($skill[Ambidextrous Funkslinging]))
+					page = throw_items($item[rock band flyers],$item[antique hand mirror]);
+				else {
+					page = throw_item($item[rock band flyers]);
+					if(!contains_text(page,"You slink away, dejected and defeated.")) {
+						page = throw_item($item[antique hand mirror]);
+					}
+				}
 			} else {
-				page=throw_items($item[jam band flyers],$item[antique hand mirror]);
+				if(have_skill($skill[Ambidextrous Funkslinging]))
+					page = throw_items($item[jam band flyers],$item[antique hand mirror]);
+				else {
+					page = throw_item($item[jam band flyers]);
+					if(!contains_text(page,"You slink away, dejected and defeated.")) {
+						page = throw_item($item[antique hand mirror]);
+					}
+				}
 			}
 		} else {
 			page = run_combat();
@@ -57,6 +70,14 @@ void runFlyerDefault(boolean side) {
 	
 	set_choices(105,3);
 	print_goal("Flyer and kill the guy made of bees.");
+	if(!have_skill($skill[Ambidextrous Funkslinging])) {
+		print_minor_warning("You cannot funksling item, and may get beaten up.");
+		if(have_familiar($familiar[Untamed Turtle]) && my_class()==$class[Turtle Tamer]) {
+			use_familiar($familiar[Untamed Turtle]);
+		} else if(have_familiar($familiar[Levitating Potato])) {
+			use_familiar($familiar[Levitating Potato]);
+		} 
+	}
 	custom_fight("checkBeePollen","beeKiller",side);
 	
 	outfit(warOutfit);
@@ -83,6 +104,7 @@ void dewormOrchard(boolean side) {
 	get_backup_state();
 	
 	print_goal("Kill the worm queen.");
+	maximize_item();
 	while (have_effect($effect[Filthworm Guard Stench]) == 0) {
       while (have_effect($effect[Filthworm Drone Stench]) == 0) {
          while (have_effect($effect[Filthworm Larva Stench]) == 0) {
@@ -127,7 +149,8 @@ void bombSearch(boolean side) {
 	print_goal("Meet bombmaker.");
 	visit_url("bigisland.php?place=lighthouse&action=pyro&pwd");
 	print_goal("Searching for bomb barrels.");
-	obtain(5, "barrel of gunpowder", $location[sonofa beach]);
+	maximize_com();
+	obtain_item(5, $item[barrel of gunpowder], $location[sonofa beach]);
 	print_goal("Deliver payload.");
     visit_url("bigisland.php?place=lighthouse&action=pyro&pwd");
 	get_backup_state();
@@ -231,6 +254,7 @@ void findTools(boolean side) {
 	visit_url("bigisland.php?action=junkman&pwd");
 	get_backup_state();
 	
+	print_goal("Searching in the Junkyard.");
 	custom_fight("haveAllTools","searchTools");
 	
 	outfit(warOutfit);
@@ -253,14 +277,16 @@ boolean warStarted() {
 void StartWar() {
 	if(contains_text(visit_url("questlog.php?which=1"),"see if you can't stir up some trouble")) {
 		set_backup_state();
-		if(!haveWarriorFratOutfit())
+		if(!haveWarriorFratOutfit()) {
 			if(pulls_remaining()>=3 && user_confirm("Do you wish to pull outfit and bypass this part?")) {
 				if(!have_item($item[beer helmet])) take_storage(1,$item[beer helmet]);
 				if(!have_item($item[distressed denim pants])) take_storage(1,$item[distressed denim pants]);
 				if(!have_item($item[bejeweled pledge pin])) take_storage(1,$item[bejeweled pledge pin]);
 			} else {
-				print_goal("Searching for entry outfit.");
-				obtain_outfit("Filthy Hippy Disguise",$location[Hippy Camp]);
+				if(!have_outfit("Filthy Hippy Disguise")) {
+					print_goal("Searching for entry outfit.");
+					obtain_outfit("Filthy Hippy Disguise",$location[Hippy Camp]);				
+				}
 				//fulfill_condition("haveNormalHippyOutfit",$location[Hippy Camp]);
 				
 				print_goal("Searching for frat warrior outfit.");
@@ -268,6 +294,7 @@ void StartWar() {
 				obtain_outfit("Frat Warrior Fatigues",$location[Wartime Frat House (Hippy Disguise)]);
 				//fulfill_condition("haveWarriorFratOutfit",$location[Wartime Frat House (Hippy Disguise)]);
 			}
+		}
 		outfit("Frat Warrior Fatigues");
 		set_choices(142,3);
 		set_choices(141,3);
@@ -320,6 +347,7 @@ void FightWar(boolean side) {
 		}
 		print_goal("Finish the Big Whatever.");
 		maximize_strength();
+		outfit(warOutfit);
 		visit_url("bigisland.php?action=bossfight&pwd");
 		run_combat();
 		get_backup_state();

@@ -97,6 +97,7 @@ string runBabiesSearch() {
 			} else if(ghost_count==2) {
 				print_debug("Two ghost, no checking neccessary");
 				// Both ghost are in, which mean 1st choice can clear the new one.
+				// 1-new in, 2-new out cant work, so it must be 1-new out,2-new in 
 				choice = "31";
 				print_debug("Choice sequence: " + choice);
 			} else {
@@ -156,7 +157,7 @@ void SpookyravenTopFloor() {
 		print_quest_complete("You have taken the babies ghost to their mother ghost. Why, though?");
 		return;
 	} else if (!contains_text(visit_url("questlog.php?which=1"),"Lady Spookyraven's Babies")) {
-		if(!contains_text(visit_url("place.php?whichplace=manor2"),"place.php?whichplace=manor2")) {
+		if(!contains_text(visit_url("place.php?whichplace=manor2"),"place.php?whichplace=manor3")) {
 			print_not_qualified("You have not yet reached the third floor.");
 			return;
 		}
@@ -170,8 +171,10 @@ void SpookyravenTopFloor() {
 				print_debug("Reset pointer to 0,0");
 				set_property("spookyravenBabies","0|0");
 			}
+		set_backup_state();
 		custom_fight("checkTopFloorProgress","runBabiesSearch");
 
+		set_choices(884,4);
 		obtain_item(1,$item[jar of baby ghosts],$location[The Haunted Laboratory]);
 	}
 	visit_url("place.php?whichplace=manor3&action=manor3_ladys");
@@ -179,7 +182,7 @@ void SpookyravenTopFloor() {
 
 void JunkShipQuest() {
 	if(contains_text(visit_url("woods.php"),"smokesignals.gif")) {
-		print_goal("Talking to the stranded hippy..");
+		print_goal("Talk to the stranded hippy.");
 		visit_url("place.php?whichplace=woods&action=woods_smokesignals");
 		visit_url("choice.php?pwd&whichchoice=798&option=1");
 		visit_url("choice.php?pwd&whichchoice=798&option=2");
@@ -189,12 +192,10 @@ void JunkShipQuest() {
 		set_choices(795,1);
 		set_choices(796,2);
 		set_choices(797,3);
+		set_backup_state();
 		setAdventure();
 		fulfill_condition("haveComponent","setAdventure",$location[The Old Landfill]);
-		if(!buy($item[junk junk].seller,1,$item[junk junk])){
-			print_warning("Buying not work. Fix code.");
-			create(1,$item[junk junk]);
-		}		
+		create(1,$item[junk junk]);
 		print_goal("Bringing the boat to the hippy.");
 		visit_url("place.php?whichplace=woods&action=woods_hippy");
 	} else if(contains_text(visit_url("questlog.php?which=2"),"Give a Hippy a Boat")) {

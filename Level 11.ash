@@ -1,5 +1,4 @@
 import <QuestLib.ash>;
-import <zlib.ash>;
 import <Spookyraven Upstairs.ash>;
 import <Pirate.ash>;
 import <Level 02.ash>;
@@ -356,18 +355,18 @@ void LordSpookyravenQuest()
 			get_backup_state();
 		} else if (!contains_text(visit_url("questlog.php?which=1"),"-or-") &&
 			contains_text(visit_url("questlog.php?which=1"),"loosening powder")){
-			abort("Screw YOUR scavenger hunt. Find that spectacles.");
+			abort("Screw YOUR scavenger hunt. Find that spectacles, or do the job yourself.");
 		}
 		
 		if (contains_text(visit_url("questlog.php?which=1"),"Cook up the explosive mixture")) {
-			print_goal("Cook the inert bomb");
+			print_goal("Cook the inert bomb.");
 			create(1,$item[unstable fulminate]);
 		}
 		
 		item currentW = equipped_item($slot[weapon]);
 		item currentH = equipped_item($slot[off-hand]);
 		if (contains_text(visit_url("questlog.php?which=1"),"Heat up the explosive mixture")) {
-			print_goal("Heat the bomb up");
+			print_goal("Heat the bomb up.");
 			if(have_equipped($item[unstable fulminate]) || equip($item[unstable fulminate])) {
 				obtain_item(1,$item[wine bomb],$location[The Haunted Boiler Room]);
 			} else {
@@ -430,13 +429,13 @@ void PalindomeQuest()
 				if(have_item($item[pirate fledges]))
 					equip($slot[acc3], $item[pirate fledges]);
 
-				print_goal("Open Belowdecks");
+				print_goal("Open Belowdecks.");
 				fulfill_condition("belowdecksOpened", $location[The Poop Deck]);
 
 				if (belowdecksOpened()) {
 					if (!have_item($item[Talisman o' Namsilat]))
 					{
-						print_goal("Search for snakehead charrrm");
+						print_goal("Search for snakehead charrrm.");
 						print_debug("The item are made automatically by KolMafia.");
 						obtain_item(1, $item[Talisman o' Namsilat], $location[Belowdecks]);
 					}
@@ -452,6 +451,10 @@ void PalindomeQuest()
 		if (contains_text(visit_url("plains.php"),"palinlink.gif")) {
 			set_choices(129,1);
 			if(!contains_text(visit_url("place.php?whichplace=palindome"),"Awkward")) {
+				if(!have_item($item[disposable instant camera]) && !have_item($item[photograph of a dog])) {
+					print_goal("Find a camera for encounter with Racecar & Bob.");
+					obtain_item(1,$item[disposable instant camera],$location[The Haunted Bedroom]);
+				}
 				print_goal("Open door to Dr. Awkward's office.");
 				custom_fight("haveVol1","takeDogPhoto");
 				use(1,$item[I Love Me, Vol. I]);
@@ -484,10 +487,10 @@ void PalindomeQuest()
 			if(contains_text(visit_url("questlog.php?which=1"),"wet stunt nut stew")) {
 				if(pulls_remaining()>0 && storage_amount($item[wet stunt nut stew])>0 &&
 					user_confirm("Pulling the wet stunt nut stew and bypass this part?")) {
-					print_goal("Pull wet stunt nut stew");
+					print_goal("Pull wet stunt nut stew.");
 					take_storage(1,$item[wet stunt nut stew]);
 				} else {
-					print_goal("Search for wet stunt nut stew");
+					print_goal("Search for wet stunt nut stew.");
 					obtain_item(1, $item[wet stunt nut stew], $location[Inside the Palindome]);
 				}
 				visit_url("place.php?whichplace=palindome&action=pal_mroffice");
@@ -529,8 +532,8 @@ void DesertQuest()
 					}
 					adv1($location[The Shore\, Inc. Travel Agency]);
 				}
-				//buy(1,$item[UV-resistant compass]);
-				cli_execute("/buy UV-resistant compass");
+				if(!buy($item[UV-resistant compass].seller,1,$item[UV-resistant compass]))
+					cli_execute("/buy UV-resistant compass");
 			}
 		}
 		
@@ -544,8 +547,11 @@ void DesertQuest()
 
 		if(!contains_text(visit_url("beach.php"),"gnasir.gif")) {
 			set_choices(805,1);
-			while_abort();
-			adventure(have_effect($effect[Ultrahydrated]), $location[The Arid\, Extra-Dry Desert]);
+			while(!contains_text(visit_url("beach.php"),"gnasir.gif")) {
+				while_abort();
+				if(have_effect($effect[Ultrahydrated])==0) adv1($location[The Oasis]);
+				else adv1($location[The Arid\, Extra-Dry Desert]);
+			}
 		}
 		
 		// searching for stone rose
@@ -586,11 +592,12 @@ void DesertQuest()
 				visit_url("place.php?whichplace=desertbeach&action=db_gnasir");
 				visit_url("choice.php?pwd&whichchoice=805&option=2");
 				visit_url("choice.php?pwd&whichchoice=805&option=1");
-				if(!have_item($item[worm-riding hooks])) abort("Trading for hook failed.");
+				if(!have_item($item[worm-riding hooks])) res_abort("Trading for hook failed.");
 				if(!have_item($item[drum machine]) && pulls_remaining()>0 && user_confirm("Do you want to pull drum machine?")) {
 					take_storage(1,$item[drum machine]);
 				} else {
-					print_goal("Farming for drum machine..");
+					print_goal("Farm for drum machine..");
+					maximize_item();
 					obtain_item(1,$item[drum machine],$location[The Oasis]);
 				}
 				use(1,$item[drum machine]);
@@ -620,16 +627,27 @@ void PyramidQuest()
 			visit_url("place.php?whichplace=desertbeach&action=db_pyramid1");
 		}
 		
-		print_goal("Opening path to middle chamber");
-		open_location("place.php?whichplace=pyramid","pyramid_middle.gif",$location[The Upper Chamber]);
+		if(!contains_text(visit_url("place.php?whichplace=pyramid"),"pyramid_middle.gif")) {
+			print_goal("Find path to middle chamber.");
+			open_location("place.php?whichplace=pyramid","pyramid_middle.gif",$location[The Upper Chamber]);
+		} else {
+			print_goal_complete("Middle chamber opened.");
+		}
 		
-		// rat olfacting handled by WHAM
+		// rat olfacting handled by WHAM?
 		if(!contains_text(visit_url("place.php?whichplace=pyramid"),"pyramid_bottom1a.gif")) {
-			print_goal("Opening control room");
-			open_location("place.php?whichplace=pyramid","pyramid_controlroom.gif",$location[The Middle Chamber]);
-			print_goal("Get 10 wheel-turning device");
+			if(!contains_text(visit_url("place.php?whichplace=pyramid"),"pyramid_controlroom.gif")) {
+				print_goal("Open control room.");
+				open_location("place.php?whichplace=pyramid","pyramid_controlroom.gif",$location[The Middle Chamber]);
+			} else {
+				print_goal_complete("Control room opened.");
+			}
+			
 			if(item_amount($item[crumbling wooden wheel])+item_amount($item[tomb ratchet])<10) {
-				obtain_item(10-item_amount($item[tomb ratchet]),$item[tomb ratchet],$location[The Middle Chamber]);
+				print_goal("Get 10 wheel-turning device");
+				set_backup_state();
+				maximize_item();
+				obtain_item(10-item_amount($item[crumbling wooden wheel]),$item[tomb ratchet],$location[The Middle Chamber]);
 			}
 			
 			if(!have_item($item[ancient bomb])) {
@@ -654,7 +672,7 @@ void PyramidQuest()
 			if(my_adventures()<7) abort("Not enough adventures to confront Ed the Undying.");
 			adventure(7,$location[The Lower Chambers]);
 		} else {
-			abort("Something wrong with the flow. Please recheck.");
+			res_abort("Something wrong with the flow. Please recheck.");
 		}
 		
 		council();

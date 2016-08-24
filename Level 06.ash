@@ -89,8 +89,8 @@ void FriarsQuest()
 }
 void SteelQuest()
 {
-	if (my_level() >= 6)
-	{
+	if (my_level() >= 6) {
+	
 		visit_url("pandamonium.php");
 		if (contains_text(visit_url("questlog.php?which=2"),"Trial By Friar")) {
 			if (!contains_text(visit_url("questlog.php?which=2"),"this is Azazel in Hell.")) {
@@ -112,7 +112,7 @@ void SteelQuest()
 					print_goal("Using tools.");
 					equip($slot[acc3], $item[Observational glasses]);
 					equip($slot[weapon],$item[hilarious comedy prop]);
-					equip($item[Victor the insult]);
+					equip($item[Victor\, the Insult Comic Hellhound Puppet]);
 					visit_url("pandamonium.php?action=mourn&preaction=observe");
 					visit_url("pandamonium.php?action=mourn&preaction=prop");
 					visit_url("pandamonium.php?action=mourn&preaction=insult");
@@ -132,7 +132,6 @@ void SteelQuest()
 					}
 					
 					fulfill_condition("gollyDone",$location[Infernal Rackets Backstage]);
-					*/
 					
 					print_goal("Giving items to bandmembers.");
 					foreach name, mate in gollyMap {
@@ -162,27 +161,22 @@ void SteelQuest()
 				print_goal("Return Arazel's belonging.");
 				visit_url("pandamonium.php?action=temp");
 
-				if (available_amount($item[steel margarita]) > 0)
+				if (have_item($item[steel margarita]))
 					overdrink(1, $item[steel margarita]);
 
-				if (available_amount($item[steel lasagna]) > 0)
+				if (have_item($item[steel lasagna]))
 					eat(1, $item[steel lasagna]);
 
-				if (available_amount($item[steel-scented air freshener]) > 0)
+				if (have_item($item[steel-scented air freshener]))
 					use(1, $item[steel-scented air freshener]);
-			}
-			else
-			{
+				get_backup_state();
+			} else {
 				print_quest_complete("You have already completed the Azazel Quest.");
 			}
-		}
-		else
-		{
+		} else {
 			print_not_qualified("You must first complete the level 6 quest to attempt this quest.");
 		}
-	}
-	else
-	{
+	} else {
 		print_not_qualified("You must be at least level 6 to attempt this quest.");
 	}
 }
@@ -190,5 +184,6 @@ void SteelQuest()
 void main()
 {
     FriarsQuest();
-	SteelQuest();
+	if(user_confirm("Do Arazel's quest?"))
+		SteelQuest();
 }

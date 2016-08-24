@@ -14,16 +14,18 @@ void BatQuest()
 		council();
 	
 		if (contains_text(visit_url("questlog.php?which=1"),"Ooh, I Think I Smell a Bat.")) {
+			set_backup_state();
 			// Try opening the way to the lair
 			if(elemental_resistance($element[stench]) >= 10.00) {
 				print_goal_complete("Have enough resistance(1).");
-			} else if(user_confirm("Do you wish to find stench resistance in the entryway instead?")) {
-				set_backup_state();
+			} else if(!have_item($item[Pine-Fresh air freshener]) &&
+				 user_confirm("Do you wish to find stench resistance in the entryway instead?")) {
 				maximize_item();
 				obtain_item(1,$item[Pine-Fresh air freshener], $location[The Bat Hole Entrance]);
 				get_backup_state();
 			} else {
-				abort("Please boost stench resistance and try again.");
+				if(!have_item($item[Pine-Fresh air freshener]) || !equip($slot[acc3],$item[Pine-Fresh air freshener]))
+					res_abort("Please boost stench resistance and try again.");
 			}
 			
 			if(elemental_resistance($element[stench]) >= 10.00 && !contains_text(visit_url("bathole.php"),"bathole_4.gif")) {
@@ -34,33 +36,22 @@ void BatQuest()
 			
 			// killing Boss Bat and its retinue
             if (contains_text(visit_url("bathole.php"),"The Boss Bat's Lair (1)")) {
-				set_backup_state();
 				maximize_meat();
-				if (user_confirm("Try for the Boss Bat britches?"))
-				{
+				if (user_confirm("Try for the Boss Bat britches?")) {
 					change_mcd(4);
-				}
-				else if (user_confirm("Try for the Boss Bat bling?"))
-				{
+				} else if (user_confirm("Try for the Boss Bat bling?")) {
 					change_mcd(8);
-				}
-				else if ((canadia_available()) && (!contains_text(visit_url("trophies.php"),"Boss Boss")))
-				{
-					if (user_confirm("Try for the Boss Boss trophy?"))
-					{
-						change_mcd(11);      
-					}
+				} else if ((canadia_available()) && (!contains_text(visit_url("trophies.php"),"Boss Boss"))
+					&& user_confirm("Try for the Boss Boss trophy?")) {
+						change_mcd(11);
 				}
 
-				while (contains_text(visit_url("bathole.php"),"The Boss Bat's Lair (1)"))
-				{
+				while (contains_text(visit_url("bathole.php"),"The Boss Bat's Lair (1)")) {
 					while_abort();
 					adventure(1, $location[The Boss Bat's Lair]);
 				}
 				get_backup_state();
-			}
-			else
-			{
+			} else {
 				print_quest_complete("The Boss Bat had been vanquished. You diligent person you.");
 			}
 			

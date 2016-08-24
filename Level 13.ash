@@ -64,7 +64,7 @@ void shadowKilling() {
 	     abort("You don't have enough healing item to automate.");
 		 
 	int max_shadow_attack = my_maxhp()/6+100;
-	if(my_hp()<max_shadow_attack) abort("You will probably get one-shotted. Raise your hp above "+max_shadow_attack+" to try.");
+	if(my_hp()<max_shadow_attack && !restore_hp(max_shadow_attack)) res_abort("You will probably get one-shotted. Raise your hp above "+max_shadow_attack+" to try.");
 	string page = visit_url("place.php?whichplace=nstower&action=ns_09_monster5");
 	item heal_choice;
 	while(!contains_text(page,"shadow version of yourself explodes") && !contains_text(page,"You slink away, dejected and defeated.")) {

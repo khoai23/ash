@@ -71,6 +71,10 @@ boolean ghostPeakReady() {
 	return (to_int(get_property("booPeakProgress")) - item_amount($item[a-boo clue])*30)<=0;
 }
 
+boolean ghostPeakComplete() {
+	return to_int(get_property("booPeakProgress")) == 0;
+}
+
 void LOLQuest()
 {
 	if (my_level() >= 9) {
@@ -156,15 +160,23 @@ void LOLQuest()
 				maximize_item();
 				fulfill_condition("ghostPeakReady",$location[A-Boo Peak]);
 				
-				maximize_for_ghost();
-				print_goal("Using a-boo clue.");
-				set_choices(611,1);
-				while(have_item($item[a-boo clue])) {
-					restore_hp(my_maxhp());
-					while_abort();
-					use(1,$item[a-boo clue]);
-					adventure(1,$location[A-Boo Peak]);
+				if(maximize_for_ghost()) {
+					print_goal("Use a-boo clues.");
+					set_choices(611,1);
+					while(have_item($item[a-boo clue]) && !ghostPeakComplete()) {
+						restore_hp(my_maxhp());
+						while_abort();
+						use(1,$item[a-boo clue]);
+						adventure(1,$location[A-Boo Peak]);
+					}
+				} else if(user_confirm("Do you wish to bruteforce the peak?")) {
+					print_goal("Remove ghost, one step at a time");
+					get_backup_state();
+					fulfill_condition("ghostPeakComplete",$location[A-Boo Peak]);
+				} else {
+					res_abort("Consider your options.");
 				}
+				
 				if(to_int(get_property("booPeakProgress"))==0)
 					adv1($location[A-Boo Peak]);
 				else	
