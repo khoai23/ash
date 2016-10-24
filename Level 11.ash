@@ -330,14 +330,14 @@ void LordSpookyravenQuest()
 		visit_url("place.php?whichplace=manor4&action=manor4_chamberwall");
 		if(have_item($item[recipe: mortar-dissolving solution])) {
 			print_goal("Seeing the hidden bomb-making recipe");
+			
 			if(have_item($item[Lord Spookyraven's spectacles])) {
-				item subtitute = equipped_item($slot[acc3]);
-				equip($slot[acc3],$item[Lord Spookyraven's spectacles]);
-				use(1,$item[recipe: mortar-dissolving solution]);
-				equip($slot[acc3],subtitute);
-			} else {
-				use(1,$item[recipe: mortar-dissolving solution]);
-			}
+				obtain_item(1,$item[Lord Spookyraven's spectacles],$location[The Haunted Bedroom]);
+			} 
+			item subtitute = equipped_item($slot[acc3]);
+			equip($slot[acc3],$item[Lord Spookyraven's spectacles]);
+			use(1,$item[recipe: mortar-dissolving solution]);
+			equip($slot[acc3],subtitute);
 		}
 
 		if (contains_text(visit_url("questlog.php?which=1"),"blasting soda")) {

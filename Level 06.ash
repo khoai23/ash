@@ -54,6 +54,8 @@ void FriarsQuest()
         council();
 	
 		if (contains_text(visit_url("questlog.php?which=1"),"Trial By Friar")) {
+			set_backup_state();
+		
 			if (!have_item($item[Eldritch Butterknife])) {
 				print_goal("Search for butterknife.");
 				obtain_item(1, $item[Eldritch Butterknife], $location[The Dark Elbow of the Woods]);
@@ -78,6 +80,8 @@ void FriarsQuest()
 			}
 			
 			council();
+			
+			get_backup_state();
 		} else if (contains_text(visit_url("questlog.php?which=2"),"Trial By Friar")) {
 			print_quest_complete("You have already completed the level 6 quest.");
 		} else {

@@ -75,10 +75,10 @@ string runBabiesSearch() {
 			if(ghost_count==0) {
 				print_debug("No ghost, checking for choice sequence.");
 				// choice 3 will inevitably rope the last one in, so the other choice that did not do anything will expel it
-				// if choice 1 is hated by the old one, choice 2 will be hated by the last one, and vice versa
+				// if choice 1 is hated by the old one (|0|), choice 2 will be hated by the last one, and vice versa
 				choice = "3";
-				if(get_property("spookyravenBabies").char_at(4)=="|") choice = choice + "1";
-				else choice = choice + "2";
+				if(get_property("spookyravenBabies").char_at(4)=="|") choice = choice + "2";
+				else choice = choice + "1";
 				print_debug("Choice sequence: " + choice);
 			} else if(ghost_count==1) {
 				print_debug("One ghost, checking for originalty.");
@@ -106,10 +106,10 @@ string runBabiesSearch() {
 			
 			if(length(choice)==1){
 				page = manual_run_choice(886,to_int(choice));
-			}
-			else {
+				result = get_property("spookyravenBabies");
+			} else { // multiple choice neccessary, saving at last character
 				page = manual_run_choice(886,to_int(choice.char_at(0)));
-				result = result + choice.char_at(1);
+				result = get_property("spookyravenBabies") + choice.char_at(1);
 			}
 			// Parse to continue quest
 			int count = get_property("spookyravenBabies").char_at(2).to_int();
@@ -121,7 +121,7 @@ string runBabiesSearch() {
 					count += 4;
 				}
 			}
-			result = get_property("spookyravenBabies");
+			// result = get_property("spookyravenBabies") + result.char_at(1);
 			result = to_string(result.char_at(0).to_int()+1)+ "|"+to_string(count)+substring(result,3);
 			set_property("spookyravenBabies",result);
 		} else if(get_property("spookyravenBabies").char_at(0).to_int()==3) {
@@ -205,7 +205,25 @@ void JunkShipQuest() {
 	}
 }
 
+void HandlessPieQuest() {
+	if(contains_text(visit_url("questlog.php?which=2"),"Lending a Hand")) {
+		print_quest_complete("You have trashed the store and retrieved the pie.");
+	}
+
+	if(!contains_text(visit_url("questlog.php?which=1"),"Lending a Hand")) {
+		visit_url("shop.php?whichshop=armory&action=talk");
+		manual_run_choice(1065,1);
+	}
+	set_choices(1061,1);
+	obtain_item(1,$item[no-handed pie],$location[Madness Bakery]);
+	visit_url("shop.php?whichshop=armory");
+	manual_run_choice(1065,2);
+}
+
 void main() {
+	if(!contains_text(visit_url("questlog.php?which=2"),"Lending a Hand")
+		&& user_confirm("Do you want to run an errand?"))
+		HandlessPieQuest();
 	if(my_level()>4 && !contains_text(visit_url("main.php"),"island.gif")
 		&& user_confirm("Do you wish to open the island?"))
 		JunkShipQuest();

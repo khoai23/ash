@@ -195,8 +195,12 @@ void main()
 {
 	TrashQuest();
 	
-	if(!have_item($item[steam-powered model rocketship]) && my_level()>=10 && user_confirm("Do you wish to open the hole in the sky?")) {
-		unlock_skyHole();
+	if(!have_item($item[steam-powered model rocketship]) && my_level()>=10) {
+		if(user_confirm("Do you wish to open the hole in the sky?")) {
+			unlock_skyHole();
+		} else {
+			print_not_qualified("You elected not to bother with a hole.");
+		}
 	} else {
 		print_quest_complete("Sky already accessible.");
 	}

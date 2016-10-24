@@ -4,6 +4,29 @@ import <zlib.ash>;
 int maxprice = 1000;
 boolean slope_complete = false;
 
+boolean miningForOre(item ore) {
+	string page = visit_url("mining.php?intro=1&mine=1");
+	while(item_amount(ore) < 3) {
+		restore_hp(0);
+		restore_mp(0);
+		burn_mp();
+		print_debug("Amount of " + to_string(ore) + ": " + item_amount(ore));
+		matcher viable = create_matcher("(mining\\.php\\?.+?wallsparkle)",page);
+		if(find(viable)) {
+			print_debug(group(viable,1));
+			int lastIdx = last_index_of(group(viable,1),"which=");
+			string whichLocation = substring(group(viable,1),lastIdx+6,lastIdx+8);
+			print_debug(lastIdx+ " " + whichLocation);
+			page = visit_url("mining.php?mine=1&which=" + whichLocation + "&pwd");
+		} else {
+			print_minor_warning("Promising pieces not found. Changing to another location");
+			return false;
+		}
+		while_abort();
+	}
+	return true;
+}
+
 string noncom_slope_complete(int round, string opp, string text) {
 	if(text.contains_text("Perfect Melancholy")) {
 		slope_complete = true;
@@ -51,12 +74,23 @@ void TrapperQuest()
 						}
 						if(!take_storage(3-item_amount(ore),ore)) abort("Cannot pull ore.");
 					} else {
-						if(!have_outfit("mining gear")) {
+						if(!have_outfit("Mining gear") && !is_wearing_outfit("Mining gear")) {
 							print_goal("Farming for miner outfit.");
-							obtain_outfit("mining gear",$location[Itznotyerzitz Mine]);
+							obtain_outfit("Mining gear",$location[Itznotyerzitz Mine]);
 						}
 						print_goal_complete("Outfit farmed, ready for mining.");
-						abort("Mine it yourself. Fag.");
+						set_backup_state();
+						outfit("Mining gear");
+						while(!miningForOre(ore)) {
+							string page = visit_url("mining.php?intro=1&mine=1");
+							if(contains_text(page,"Find New Cavern")) {
+								//print_minor_warning("Reseting cave.");
+								visit_url("mining.php?mine=1&reset=1&pwd");
+							} else {
+								res_abort("Manual intervention required.");
+							}
+						}
+						get_backup_state();
 					}
 				} else {
 					print_goal_complete("Have enough ore.");
@@ -166,4 +200,5 @@ void TrapperQuest()
 void main()
 {
 	TrapperQuest();
+	//miningForOre($item[linoleum ore]);
 }

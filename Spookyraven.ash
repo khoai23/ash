@@ -26,6 +26,8 @@ void UnlockSpookyraven()
 		return;
 	}
 	
+	set_backup_state();
+	
 	if(!have_item($item[Spookyraven billiards room key])) {
 		print_goal("Searching for billiards key.");
 		obtain_item(1, $item[Spookyraven billiards room key], $location[The Haunted Kitchen]);
@@ -53,6 +55,7 @@ void UnlockSpookyraven()
 	
 	print_goal("Giving the ghost her necklace");
 	visit_url("place.php?whichplace=manor1&action=manor1_ladys");
+	get_backup_state();
 }
 
 void main()

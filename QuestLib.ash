@@ -577,6 +577,7 @@ boolean acquire_token() {
 		set_choices(690,3); // ignore chest
 		set_choices(691,3); // ignore chest
 	}
+	cli_execute("conditions clear");
 	while(get_last_encounter()!="Daily Done, John.") {
 		while_abort();
 		adv1($location[The Daily Dungeon],-1,"");
@@ -602,7 +603,7 @@ void main()
 	print("Used for testing new function and config.","blue");
 	//test();
 	boolean choice = user_confirm("Do you wish to be reckless and (maybe) get your ass beaten?");
-	vprint("Recklessness: " + choice,"blue",1);
+	vprint("Recklessness: " + choice,"blue",6);
 	set_recklessness(choice);
 	run_pvp();
 	acquire_token();

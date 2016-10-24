@@ -78,6 +78,7 @@ void runFlyerDefault(boolean side) {
 			use_familiar($familiar[Levitating Potato]);
 		} 
 	}
+	maximize_noncom();
 	custom_fight("checkBeePollen","beeKiller",side);
 	
 	outfit(warOutfit);
